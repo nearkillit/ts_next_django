@@ -59,10 +59,10 @@ export const userSlice = createSlice({
                 cart: action.payload
             }
         },
-        // FETCH_ITEM(state, action: PayloadAction<ItemState>){
-        //     if(action.payload.coffee) return { ...state,Coffee: action.payload.coffee }
-        //     if(action.payload.topping) return { ...state,Topping: action.payload.topping }           
-        // }        
+        FETCH_ITEM(state, action: PayloadAction<any>){
+            if(action.payload.coffee) return { ...state,Coffee: action.payload.coffee }
+            if(action.payload.topping) return { ...state,Topping: action.payload.topping }           
+        }
     },
   })
 
