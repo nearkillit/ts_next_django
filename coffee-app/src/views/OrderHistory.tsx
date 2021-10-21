@@ -38,19 +38,19 @@ const OrderHistory: VFC = () => {
   }
 
   useEffect(()=>{    
-    let getOrder = []   
+    let getOrder = state.orderhistory   
     let Coupons = state.Coupon
  
     if( state.orderhistory && state.orderhistory.length !== 0){
       // cartのIDを全て商品情報に変換 Item, Topping, subtotal を追加
       getOrder = state.orderhistory.map( o => { 
         o.cartItemList = o.cartItemList.map(c => {            
-            c.Item = GetItemById(c.Itemid, state.Coffee)
-            c.Topping = c.toppingid.map( t => GetItemById(t, state.Topping) )
-            c.subtotal = ( c.Item[c.price] +  ( c.Topping.length !==0 && c.Topping.reduce((ac,cu) => ac + cu[c.price],0))) * ( c.number * 1 )
+            c.Coffee = GetItemById(c.Itemid, state.Coffee)
+            c.Topping = c.topping_id.map( t => GetItemById(t, state.Topping) )
+            c.subtotal = ( c.Coffee[c.price] +  ( c.Topping.length !==0 && c.Topping.reduce((ac,cu) => ac + cu[c.price],0))) * c.item_number
             return c
         })
-        o.couponPrice = (Coupons && o.couponCode) ? o.couponCode.reduce((a,c) => GetDiscountByCoupon(c,Coupons) + a,0) : 0   
+        // o.couponPrice = (Coupons && o.couponCode) ? o.couponCode.reduce((a,c) => GetDiscountByCoupon(c,Coupons) + a,0) : 0   
         return o        
       })      
       setOrder(getOrder)
@@ -80,7 +80,7 @@ const OrderHistory: VFC = () => {
               return (
               <TableRow key={index}>
                 <TableCell component="th" scope="row">
-                  <img src={`${process.env.PUBLIC_URL}/${c.Item.image}`} height="100px" alt="商品" style={{borderRadius:5}}/>
+                  <img src={`${window.location.origin}/${c.Item.image}`} height="100px" alt="商品" style={{borderRadius:5}}/>
                   {c.Item.name}
                 </TableCell>
                 <TableCell>{c.price.replace('price','') + 'サイズ'}、{c.Item[c.price]}円、{c.number}個</TableCell>              

@@ -7,14 +7,13 @@ import { StoreState, ToppingState, CartItemListState } from '../type/type'
 import { DefaultRootState, useDispatch, useSelector } from "react-redux";
 import { useState, useEffect } from "react";
 import { useHistory } from 'react-router-dom';
-import firebase from "firebase/compat/app";
-import 'firebase/compat/firestore';
-import Button from '@material-ui/core/Button';
+
 // components
-import { newCart } from '../store/index'
+// import { newCart } from '../store/index'
 import { GetItemById, GetDiscountByCoupon } from '../components/Items'
 import '../App.css';
 // material ui
+import Button from '@material-ui/core/Button';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -111,28 +110,28 @@ const OrderConfirm: VFC = () => {
 
     // by = 購入者情報
     const newOrder = Object.assign(by,{ cartItemList: state.cart.cartItemList } )   // coupon追加するならここ           
-    sendMail(newOrder)
+    // sendMail(newOrder)
     // MakeReceipt(newOrder)
 
-    // add history
-    firebase.firestore()
-            .collection(`users/${state.user.uid}/carts`)
-            .doc(state.cart.uid)
-            .update(newOrder)
-            .then( d => {
-              dispatch({ type:'ADD_ORDERHISTORY', payload:{ uid: state.cart.uid, orderhistory: newOrder }})
-            })
+    // // add history
+    // firebase.firestore()
+    //         .collection(`users/${state.user.uid}/carts`)
+    //         .doc(state.cart.uid)
+    //         .update(newOrder)
+    //         .then( d => {
+    //           dispatch({ type:'ADD_ORDERHISTORY', payload:{ uid: state.cart.uid, orderhistory: newOrder }})
+    //         })
 
-    // create cate
-    firebase.firestore()
-              .collection(`users/${state.user.uid}/carts`)
-              .add(newCart)
-              .then( d => {
-                const newCarts = Object.assign({}, newCart)
-                newCarts.uid = d.id
-                newCarts.cartItemList = []
-                dispatch({ type:'CREATE_CART', payload:{ cart: newCarts }})
-              })
+    // // create cate
+    // firebase.firestore()
+    //           .collection(`users/${state.user.uid}/carts`)
+    //           .add(newCart)
+    //           .then( d => {
+    //             const newCarts = Object.assign({}, newCart)
+    //             newCarts.uid = d.id
+    //             newCarts.cartItemList = []
+    //             dispatch({ type:'CREATE_CART', payload:{ cart: newCarts }})
+    //           })
     handleLink('orderfinish')
   }
 
@@ -311,20 +310,20 @@ const validOrderdate=(orderDate)=>{
     let newCartItemList = state.cart.cartItemList     
     if(newCartItemList){
       // cartのIDを全て商品情報に変換 Item, Topping, subtotal を追加
-      const newCouponCodes = couponCodes.concat()
+      // const newCouponCodes = couponCodes.concat()
 
       newCartItemList = newCartItemList.map( c => {
-        c.Item = GetItemById(c.Itemid, state.Coffee)
-        c.Topping = c.toppingid.map( t => GetItemById(t, state.Topping) )
-        c.subtotal = ( c.Item[c.price] + c.Topping.reduce((ac,cu) => ac + cu[c.price],0)) * Number(c.number)
-        if(c.Item.couponCode){          
-          for(let i = 0; i < Number(c.number); i++ ){
-            newCouponCodes.push(c.Item.couponCode)
-          }
-        }
+        c.Coffee = GetItemById(c.Itemid, state.Coffee)
+        c.Topping = c.topping_id.map( t => GetItemById(t, state.Topping) )
+        c.subtotal = ( c.Coffee[c.price] + c.Topping.reduce((ac,cu) => ac + cu[c.price],0)) * c.item_number
+        // if(c.Item.couponCode){          
+        //   for(let i = 0; i < Number(c.number); i++ ){
+        //     newCouponCodes.push(c.Item.couponCode)
+        //   }
+        // }
         return c
       })
-      newCouponCodes.length !== 0 && setCouponCodes(newCouponCodes)        
+      // newCouponCodes.length !== 0 && setCouponCodes(newCouponCodes)        
       setCartItemList(newCartItemList)      
     }
     else{
@@ -372,15 +371,15 @@ const validOrderdate=(orderDate)=>{
             return (
             <TableRow key={index}>                
               <TableCell component="th" scope="row">                
-                <img src={`${process.env.PUBLIC_URL}/${c.Item.image}`} height="100px" alt="商品" style={{borderRadius:5}}/>
-                <span>{c.Item.name}</span>  
+                <img src={`${window.location.origin}/${c.Coffee.image}`} height="100px" alt="商品" style={{borderRadius:5}}/>
+                <span>{c.Coffee.coffee_name}</span>  
               </TableCell>
-              <TableCell>{c.price.replace('price','') + 'サイズ'}、{c.Item[c.price]}円、{c.number}個</TableCell>
+              <TableCell>{c.price.replace('price','') + 'サイズ'}、{c.Coffee[c.price]}円、{c.item_number}個</TableCell>
               <TableCell>
                 <ul>
                 {c.Topping.map((t,i) => {
                   return (
-                    <li key={i}>{t.name}、{t[c.price]}円</li>
+                    <li key={i}>{t.topping_name}、{t[c.price]}円</li>
                   )
                 })}
                 </ul>
