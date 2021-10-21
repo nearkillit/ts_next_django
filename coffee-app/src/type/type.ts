@@ -6,7 +6,7 @@ export type StoreState = {
     TimeSale?: Array<TimeSaleState>,
     user: any,      
     cart: CartState,
-    orderhistory: Array<OrderhistoryState>
+    orderhistory: OrderhistoryState
 }
 
 export type CoffeeState = {
@@ -39,27 +39,29 @@ export type TimeSaleState = {
 
 export type CartItemListState = {    
     Itemid: number,
-    Topping: Array<ToppingState>,
-    number: string,
-    price: "priceM" | "priceL",
+    // Topping: Array<ToppingState>,
+    item_number: number,
+    price: string,
     subtotal: number,
-    topping_id: Array<number>
+    topping_id: Array<number>,
+    Coffee?: CoffeeState,
+    Topping?: Array<ToppingState>
 }
 
 export type CartState = {
     addressNumber: string,
     address: string,
-    cartItemList: Array<CartItemListState> | [],
-    couponCode?: string,
+    cartItemList: Array<CartItemListState>,    
     email: string,
     order_name: string,
     order_date: string,
     order_time: string,
-    status: '0' | '1' | '2',
-    tel: string,    
+    status: number,
+    tel: string,
+    // couponCode?: string,
 }
 
-export type OrderhistoryState = Array<CartState>
+export type OrderhistoryState = CartState[]
 
 export type ItemState = {
     coffee: Array<CoffeeState>

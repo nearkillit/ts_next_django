@@ -4,10 +4,6 @@ import type { VFC } from "react"
 import 'react-redux'
 import { StoreState } from '../type/type'
 
-// import React, { Component } from 'react';
-import firebase from "firebase/compat/app";
-import 'firebase/compat/firestore';
-
 // material ui
 import Button from '@material-ui/core/Button' 
 import Card from '@material-ui/core/Card';
@@ -32,7 +28,7 @@ const ItemDetail: VFC = () =>{
     const handleLink = (path: string) => history.push(path)
 
     let [choiceTopping, setChoiceTopping] = useState<Array<number>>([])
-    let [sizeChoice, setSizeChoice] = useState<string>("")
+    let [sizeChoice, setSizeChoice] = useState<"M" | "L">("M")
     let [quantityChoise, setQuantityChoise] = useState<string>("")
     let [sizeFinal, setSizeFinal] = useState<string>("")
     let [puantityFinal, setQuantityFinal] = useState<string>("")
@@ -57,7 +53,7 @@ const ItemDetail: VFC = () =>{
     }
     
     let setQuantity = (e) => setQuantityChoise(e.target.value) 
-    let allSelects ={}
+    // let allSelects = {}
     let sizePrice = ""
     
     const checkValid = ()  => {
@@ -65,10 +61,6 @@ const ItemDetail: VFC = () =>{
         setQuantityFinal("")
         let errorSentence = ""
 
-        if (sizeChoice==="") {       
-           setSizeFinal("サイズを選択してください")
-           errorSentence += "サイズ "
-        } 
         if (quantityChoise==="" || quantityChoise==="-------------------------------") {       
            setQuantityFinal("個数を選択してください")
            errorSentence += "個数 "
@@ -81,27 +73,32 @@ const ItemDetail: VFC = () =>{
             }else if(sizeChoice === "L"){
                 sizePrice= "priceL"
             }
-            
-            allSelects = {number:quantityChoise, Itemid:GetItemById(Item_id*1,state.Coffee).id, toppingid:choiceTopping, price:sizePrice}            
+
+            let allSelects = {  item_number: Number(quantityChoise), 
+                                Itemid: Number(GetItemById(Item_id, state.Coffee).id), 
+                                topping_id: choiceTopping, 
+                                price : "price" + sizePrice,
+                                subtotal: 0 }
+     
             // カート作成         
-            let cartItemList = state.cart.cartItemList            
-            cartItemList.push(allSelects)            
+            let cartItemList = state.cart.cartItemList
+            cartItemList.push(allSelects)
             let cartItem = state.cart
             cartItem.cartItemList = cartItemList
             
             // ログインしていた場合はFirebase、storeを更新
             if(state.user && state.user.uid){
-                firebase.firestore()
-                  .collection(`users/${state.user.uid}/carts`)
-                  .doc(state.cart.uid)
-                  .update(cartItem)
-                  .then( querySnapshot => {                                              
-                    dispatch({ type: 'UPDATE_CARTITEMLIST', payload: { cartItemList }})            
-                  })
+                // firebase.firestore()
+                //   .collection(`users/${state.user.uid}/carts`)
+                //   .doc(state.cart.uid)
+                //   .update(cartItem)
+                //   .then( querySnapshot => {                                              
+                //     dispatch({ type: 'UPDATE_CARTITEMLIST', payload: { cartItemList }})            
+                //   })
             
             // ログインしていない場合はstore飲み更新
             }else{
-                dispatch({ type: 'UPDATE_CARTITEMLIST', payload: { cartItemList }})
+                // dispatch({ type: 'UPDATE_CARTITEMLIST', payload: { cartItemList }})
             }  
             handleLink('/cart')              
         }                
@@ -123,7 +120,7 @@ const ItemDetail: VFC = () =>{
             <h1>{GetItemById(Item_id*1,state.Coffee).name} </h1>   
             <p>{GetItemById(Item_id*1,state.Coffee).detail}</p>
          
-            <img src={`${process.env.PUBLIC_URL}/${GetItemById(Item_id*1,state.Coffee).image}`}  height="400px" alt="商品" style={{borderRadius:10}}/>
+            <img src={`${window.location.origin}/${GetItemById(Item_id*1,state.Coffee).image}`}  height="400px" alt="商品" style={{borderRadius:10}}/>
             <h3 style={{backgroundColor:"rgb(70, 77, 180)"}}>合計金額：{totalPrice()}円(税抜)</h3>                      
             <p id='error'> {sizeFinal}</p>
             <p>

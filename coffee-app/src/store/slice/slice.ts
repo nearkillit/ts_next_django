@@ -11,9 +11,7 @@ export type userState = {
 
 export const initialState: userState = {
     Coffee:[],
-    Topping:[],
-    // Coupon:[],
-    // TimeSale:[],    
+    Topping:[],  
     user: {},      
     cart:{},
     orderhistory:[]
@@ -35,14 +33,10 @@ export const userSlice = createSlice({
             };  
         },
         UPDATE_USER(state, action: PayloadAction<any>){
+            console.log(action);            
             return { ...state,
                 user: action.payload.user
-              }
-        },
-        UPDATE_TIMESALE(state, action: PayloadAction<any>){
-            return { ...state,
-                TimeSale: action.payload.TimeSale
-              }
+            }
         },
         ADD_ORDERHISTORY(state, action: PayloadAction<CartState>){
             return { ...state,
@@ -59,10 +53,10 @@ export const userSlice = createSlice({
                 cart: action.payload
             }
         },
-        // FETCH_ITEM(state, action: PayloadAction<ItemState>){
-        //     if(action.payload.coffee) return { ...state,Coffee: action.payload.coffee }
-        //     if(action.payload.topping) return { ...state,Topping: action.payload.topping }           
-        // }        
+        FETCH_ITEM(state, action: PayloadAction<any>){
+            if(action.payload.coffee) return { ...state,Coffee: action.payload.coffee }
+            if(action.payload.topping) return { ...state,Topping: action.payload.topping }           
+        }
     },
   })
 
@@ -79,13 +73,4 @@ export const userSlice = createSlice({
     status:0,
     tel:'',
     couponCode:''
-  }
-                  
-//   const enhancer = compose(persistState(['user'], { key: 'user' }),applyMiddleware(thunk));
-
-//   const store = createStore(reducer,
-//                             window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__() ,
-//                             // enhancer
-//                             );
-
-//   export default store;
+  }                  

@@ -65,7 +65,7 @@ const ItemView: VFC = () => {
     }  
     const Kensaku=()=>{        
         let newSearched = state.Coffee.filter(val2 =>{
-            return val2.name.includes(word)
+            return val2.coffee_name.includes(word)
         });
 
         newSearched.length === 0 ? 
@@ -136,7 +136,7 @@ const ItemView: VFC = () => {
                     const diffHour = 24 - getToday.getHours()
                     return (
                     <ImageListItem key={t.id} onClick={()=>handleLink(`/itemdetail/${t.id}`)}>
-                        <img src={`${process.env.PUBLIC_URL}/${t.image}`} width="100%" alt="商品" />
+                        <img src={`${window.location.origin}/${t.image}`} width="100%" alt="商品" />
                         <ImageListItemBar
                         title={t.deadline.substr(0,4)+ "年" + t.deadline.substr(5,2) + "月" + t.deadline.substr(8,2) + "日"　+ "まで"}
                         subtitle={<p style={timeSalePriceAfter}>あと{diffDay}日{diffHour}時間</p>}
@@ -186,7 +186,7 @@ const ItemView: VFC = () => {
                             {search.map((val3,index)=>{
                                 return(
                                     <ImageListItem key={index} onClick={()=>handleLink(`/itemdetail/${val3.id}`)}>
-                                        <img src={`${process.env.PUBLIC_URL}/${val3.image}`} width="100%" alt="商品" />
+                                        <img src={`${window.location.origin}/${val3.image}`} width="100%" alt="商品" />
                                         <ImageListItemBar
                                             title={val3.name}
                                             subtitle={
