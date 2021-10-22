@@ -3,14 +3,13 @@ import type { VFC } from "react"
 import 'react-redux'
 import { StoreState, CoffeeState } from '../src/type/type'
 import Link from 'next/link'
-import { userSlice } from '../src/store/slice/slice'
-import { NextPage } from "next";
+
 
 import { useState, useEffect } from 'react'
 import Button from '@material-ui/core/Button';
 import SearchSharp from '@material-ui/icons/SearchSharp';
 import { DefaultRootState, useSelector, useDispatch } from 'react-redux';
-import { GetItemById } from '../src/components/Items'
+import axios from 'axios'
 
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -26,6 +25,7 @@ import ImageListItemBar from '@material-ui/core/ImageListItemBar';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import IconButton from '@material-ui/core/IconButton';
 import InfoIcon from '@material-ui/icons/Info';
+import { resolveHref } from 'next/dist/shared/lib/router/router';
 
 declare module 'react-redux' {
     interface DefaultRootState extends StoreState {}
@@ -60,8 +60,8 @@ const ItemView = () => {
     const [searhResult, setSearchResult]  = useState<string>('商品を検索できます')
     const getToday = new Date()
     const now = { year: getToday.getFullYear(), month: getToday.getMonth() + 1, day: getToday.getDate(), hours: getToday.getHours()}
-
     const classes = useStyles();    
+    const [testWeather, setTestWeather] = useState<string>('')
 
     const type=(e: React.ChangeEvent<HTMLInputElement>)=>{
         setWord(e.target.value)
@@ -101,8 +101,27 @@ const ItemView = () => {
         color: "red"
     }
 
-    const stateCheck = () => {              
-    // dispatch(userSlice.actions.UPDATE_USER({ user:'test'}))
+    const stateCheck = async () => {              
+        await new Promise((resolve, reject) => {
+            axios.get('https://weather.tsukumijima.net/api/forecast',{
+              params:{
+                city:"130010"
+              }
+            }).then(res =>{
+              // console.log(res)
+              const weather = {
+                  name:res.data.location.city,
+                  date:res.data.forecasts[0].date,
+                  detail:res.data.forecasts[0].detail.weather,
+                  hai:res.data.forecasts[0].temperature.max.celsius,
+                  row:res.data.forecasts[0].temperature.min.celsius,
+                  img:res.data.forecasts[0].image.url
+                }
+                console.log(weather)
+                setTestWeather(weather.detail)
+                resolve(res.status)
+              })  
+        })  
     }
 
     useEffect(() => {
@@ -131,7 +150,8 @@ const ItemView = () => {
                 <TableBody>
                     <TableRow>
                     <TableCell>
-                    <div className={classes.root}>                        
+                    <div className={classes.root}>
+                        <p>{testWeather}</p>
                         <Button onClick={stateCheck}>stateCheck</Button>
                         <ImageList rowHeight={240} className={classes.imageList}>
                             <ImageListItem key="Subheader" cols={2} style={{ height: 'auto' }}>
@@ -171,18 +191,31 @@ const ItemView = () => {
     </Paper>
     )}
 
-// ItemView.getInitialProps = async () => {
-//     let testData = ''
-//     await new Promise((resolve, reject) => {
-//         setTimeout(() => {
-//             testData = 'change'
-//             resolve()
-//         }, 1000)        
-//     })        
+ItemView.getInitialProps = async () => {
+    let testData = ''
+    await new Promise((resolve, reject) => {
+        axios.get('https://weather.tsukumijima.net/api/forecast',{
+          params:{
+            city:"130010"
+          }
+        }).then(res =>{
+          // console.log(res)
+          const weather = {
+              name:res.data.location.city,
+              date:res.data.forecasts[0].date,
+              detail:res.data.forecasts[0].detail.weather,
+              hai:res.data.forecasts[0].temperature.max.celsius,
+              row:res.data.forecasts[0].temperature.min.celsius,
+              img:res.data.forecasts[0].image.url
+            }
+            console.log(weather)
+            resolve(res.status)
+          })  
+    })        
     
-//     console.log('check');
+    console.log('check');
     
-//     return { testData };
-// }
+    return { testData };
+}
 
 export default ItemView
