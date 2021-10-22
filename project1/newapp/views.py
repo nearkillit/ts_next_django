@@ -29,7 +29,7 @@ class CartVieSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
     
     def get_queryset(self):
-        return self.queryset.filter(user=self.request.user)
+        return self.queryset.filter(user=self.request.user.id)
 
 
 class OrderCoffeeVieSet(viewsets.ModelViewSet):
@@ -43,7 +43,7 @@ class OrderersVieSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
     def get_queryset(self):
-        return self.queryset.filter(user=self.request.user)
+        return self.queryset.filter(user=self.request.user.id)
 
 class OrderToppingVieSet(viewsets.ModelViewSet):
     queryset = OrderTopping.objects.all()
