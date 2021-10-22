@@ -86,7 +86,7 @@ const UserCheck = () => {
                 <Button onClick={logout} style={whiteMoji}><LockIcon />ログアウト</Button>                  
               </>          
               :
-              <Button onClick={login} style={whiteMoji}><LockOpenIcon />ログイン</Button>
+              <Link href="/component/Login/"><a><Button onClick={login} style={whiteMoji}><LockOpenIcon />ログイン</Button></a></Link>
             }   
     </>                
   )
