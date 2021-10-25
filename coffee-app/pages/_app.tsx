@@ -4,7 +4,8 @@ import { useDispatch, useSelector, DefaultRootState } from "react-redux";
 import React, { useState, useEffect } from "react";
 import { AppProps } from 'next/app';
 import { Provider } from 'react-redux';
-import createStore from '../src/store/createStore';
+import store from '../src/store/createStore';
+import { userSlice } from '../src/store/slice/slice';
 import { StoreState } from '../src/type/type'
 
 // material ui
@@ -75,8 +76,34 @@ const UserCheck = () => {
     color: "white"
   }
 
+  const statecheck = () => {
+    console.log(state);    
+  }
+
+  const getItem = async () => {
+    await new Promise((resolve, reject) => {
+      axios.get('http://127.0.0.1:8000/api/coffee/'          
+      ).then(res =>{  
+          // console.log(res);
+          dispatch(userSlice.actions.FETCH_ITEM({Coffee: res.data}))
+
+          axios.get('http://127.0.0.1:8000/api/topping/'          
+          ).then(_res =>{          
+            dispatch(userSlice.actions.FETCH_ITEM({Topping: _res.data}))
+            resolve(_res)
+          })           
+          resolve(res)
+      })  
+    })
+  }
+
+  useEffect(() => {     
+    // getItem()
+  },[]) 
+
   return (
     <>
+      <Button onClick={statecheck} >State</Button>
      { state.user && state.user.displayName ? 
               <>          
                 <div style={userStyle}>
@@ -102,17 +129,17 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
   }, []);
 
   return (
-    <Provider store={createStore()}>
-      <ThemeProvider theme={theme}>
+    <Provider store={store}>
+      <ThemeProvider theme={theme}>      
       <div className="App">        
         <AppBar>          
-          {/* <div className='App-header1'>
+          <div className='App-header1'>
             <HistoryApp tag='button_img' link='/' context={`/header_logo.png`}  />        
-          </div> */}
+          </div>
           <span className='App-header2' >
             <UserCheck />
-            <HistoryApp tag='button' link='/cart' icon={<ShoppingCartIcon />} name='カート'/>
-            <HistoryApp tag='button' link='/orderhistory' icon={<HistoryIcon />} name='注文履歴'/>           
+            <HistoryApp tag='button' link='/component/Cart' icon={<ShoppingCartIcon />} name='カート'/>
+            <HistoryApp tag='button' link='/component/OrderHistory' icon={<HistoryIcon />} name='注文履歴'/>           
           </span> 
         </AppBar>               
       </div>

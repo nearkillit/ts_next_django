@@ -94,7 +94,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
 
-
 class Coffee(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     coffee_name = models.CharField('商品名', max_length=100, blank=False)
@@ -105,6 +104,7 @@ class Coffee(models.Model):
 
     def __str__(self):
         return self.coffee_name
+
 
 class Topping(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -118,7 +118,6 @@ class Topping(models.Model):
 class Carts(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user')
-
 
 
 class OrderCoffee(models.Model):
@@ -141,7 +140,6 @@ class Orderers(models.Model):
     tel = models.CharField('電話番号', max_length=14, blank=False) #　型付けする
     status = models.IntegerField('注文状況', blank=False, null=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-
 
 
 class OrderTopping(models.Model):

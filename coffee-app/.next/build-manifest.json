@@ -29,10 +29,10 @@
       "static/chunks/main.js",
       "static/chunks/pages/_error.js"
     ],
-    "/component/OrderHistory": [
+    "/component/OrderConfirm": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
-      "static/chunks/pages/component/OrderHistory.js"
+      "static/chunks/pages/component/OrderConfirm.js"
     ]
   },
   "ampFirstPages": []

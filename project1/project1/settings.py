@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'rest_auth.registration',
+    'corsheaders',              # CORS設定
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -55,6 +56,7 @@ INSTALLED_APPS = [
 AUTH_USER_MODEL = 'newapp.User'
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware', # new topに置く　CORS設定    
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -165,3 +167,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # sitesフレームワークの1つでいくつかのDjangoプロジェクトから複数のWebサイトをホストするためのID
 SITE_ID = 1
+
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:3001',
+    'http://127.0.0.1:3001',    
+]

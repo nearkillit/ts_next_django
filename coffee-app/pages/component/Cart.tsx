@@ -6,8 +6,10 @@ import { StoreState, CartState, CartItemListState } from '../../src/type/type'
 // react
 import { DefaultRootState, useDispatch, useSelector } from "react-redux";
 import { useState, useEffect } from "react";
-import { GetItemById } from '../../src/components/Items'
-import { useHistory } from 'react-router-dom'
+// import { GetCoffeeById, GetToppingById } from '../../src/components/Items'
+import Router from 'next/router'
+import { userSlice } from '../../src/store/slice/slice';
+
 // material ui
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -29,51 +31,46 @@ declare module 'react-redux' {
 
 const Cart: VFC = () => {
   const dispatch = useDispatch();
-  const state = useSelector((state: DefaultRootState ) => state)
+  const state = useSelector((state: DefaultRootState ) => state.user)
   const [cartItemList, setCartItemList] = useState<Array<CartItemListState>>([])  
+  const handleLink = path => Router.push(path)
 
   const deleteCart = (index) => {
     const newCartItemList = cartItemList.filter((c,i) => i !== index)
-    const newCarts = Object.assign({},state.cart) 
-    newCarts.cartItemList = newCartItemList  
+    // const newCarts = Object.assign({},state.cart) 
+    // newCarts.cartItemList = newCartItemList
     
     // ログインしている場合
     if(state.user && state.user.uid){
-      // firebase.firestore()
-      //       .collection(`users/${state.user.uid}/carts`)
-      //       .doc(state.cart.uid)
-      //       .update(newCarts)
-      //       .then( querySnapshot => {                                              
-      //           dispatch({ type: 'UPDATE_CARTITEMLIST', payload: { cartItemList: newCartItemList }})              
-      //       })   
+      dispatch(userSlice.actions.UPDATE_CARTITEMLIST(newCartItemList))
     }else{
-      // dispatch({ type: 'UPDATE_CARTITEMLIST', payload: { cartItemList: newCartItemList }})
+      dispatch(userSlice.actions.UPDATE_CARTITEMLIST(newCartItemList))
     }
-    
+
+    setCartItemList(newCartItemList)
   }
 
   const order = () => {    
     // ログインしている場合
     if(state.user){
-      // handleLink('/orderconfirm')
+      handleLink('/component/OrderConfirm')
     }else{
-      localStorage.setItem('middle_login', String(true))
-      localStorage.setItem('cart',JSON.stringify(state.cart))
+      // localStorage.setItem('middle_login', String(true))
+      // localStorage.setItem('cart',JSON.stringify(state.cart))
       // login            
-                                          
+      handleLink('/component/OrderConfirm')                       
     }
 
   }  
 
-  useEffect(()=>{
-    let newCartItemList = state.cart ? state.cart.cartItemList : undefined
+  useEffect(()=>{    
+    let newCartItemList: Array<CartItemListState> = state.cart.cartItemList
     if(newCartItemList){
-      // cartのIDを全て商品情報に変換 Item, Topping, subtotal を追加
-      newCartItemList = newCartItemList.map( c => { 
-        c.Coffee = GetItemById(c.Itemid, state.Coffee)
-        c.Topping = c.topping_id.map( t => GetItemById(t, state.Topping) )
-        c.subtotal = ( c.Coffee[c.price] + c.Topping.reduce((ac,cu) => ac + cu[c.price],0)) * c.item_number
-        return c
+      // subtotal を追加
+      newCartItemList = newCartItemList.map( c => {
+        let cc = Object.assign({},c)
+        cc.subtotal = ( c.Coffee["coffee_" + c.price] + c.Topping.reduce((ac,cu) => ac + cu["topping_" + c.price],0)) * c.item_number
+        return cc
       })            
       setCartItemList(newCartItemList)
     }            
@@ -103,20 +100,20 @@ const Cart: VFC = () => {
             <TableCell>削除</TableCell>
           </TableRow>
         </TableHead>
-        <TableBody className='chumon'>          
+        <TableBody className='chumon'>
          {cartItemList.map((c, index) => {            
             return (
             <TableRow key={index}>
               <TableCell component="th" scope="row">
-                <img src={`${window.location.origin}/${c.Coffee.image}`} height="100px" alt="商品" style={{borderRadius:5}}/>
+                <img src={c.Coffee.img} height="100px" alt="商品" style={{borderRadius:5}}/>
                 {c.Coffee.coffee_name}
               </TableCell>
-              <TableCell>{c.price.replace('price','') + 'サイズ'}、{c.Coffee[c.price]}円、{c.item_number}個</TableCell>              
+              <TableCell>{c.price.replace('price','') + 'サイズ'}、{c.Coffee["coffee_" +c.price]}円、{c.item_number}個</TableCell>              
               <TableCell>
                 <ul>                     
                 {c.Topping.map((t,i) => {                  
                   return (
-                    <li key={i}>{t.topping_name}、{t[c.price]}円</li>
+                    <li key={i}>{t.topping_name}、{t["topping_" + c.price]}円</li>
                   )
                 })}
                 </ul> 
