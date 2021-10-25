@@ -1,12 +1,13 @@
-// ts
+// react
 import * as React from 'react';
 import type { VFC } from "react"
 import 'react-redux'
-import { StoreState, ToppingState, CartItemListState } from '../../src/type/type'
-
 import { DefaultRootState, useDispatch, useSelector } from "react-redux";
 import { useState, useEffect } from "react";
+// next
 import Router from 'next/router'
+// component
+import { StoreState, ToppingState, CartItemListState } from '../../src/type/type'
 import { userSlice } from '../../src/store/slice/slice';
 
 // components

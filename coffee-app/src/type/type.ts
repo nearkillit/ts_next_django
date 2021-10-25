@@ -66,3 +66,14 @@ export type ItemState = {
     coffee: Array<CoffeeState>
     topping: Array<ToppingState>
 }
+
+export type SignUpState = {
+    email: string,    
+    password1: string,
+    password2: string
+}
+
+export type UserDataState = {
+    email: string,
+    id: string
+}

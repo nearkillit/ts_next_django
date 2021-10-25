@@ -1,9 +1,12 @@
 // react
-import Link from 'next/link'
 import { useDispatch, useSelector, DefaultRootState } from "react-redux";
 import React, { useState, useEffect } from "react";
-import { AppProps } from 'next/app';
 import { Provider } from 'react-redux';
+// next
+import Link from 'next/link'
+import { AppProps } from 'next/app';
+import { useRouter } from 'next/router'
+// component
 import store from '../src/store/createStore';
 import { userSlice } from '../src/store/slice/slice';
 import { StoreState } from '../src/type/type'
@@ -11,7 +14,7 @@ import { StoreState } from '../src/type/type'
 // material ui
 import theme from './theme'
 import { ThemeProvider } from '@material-ui/core/styles'
-import { CssBaseline } from '@material-ui/core'
+import { CssBaseline, useRadioGroup } from '@material-ui/core'
 import Button from '@material-ui/core/Button';
 import { AppBar } from "@material-ui/core";
 // material ui icon
@@ -46,19 +49,21 @@ function HistoryApp(props){
 
 const UserCheck = () => {
   const dispatch = useDispatch();
-  const state = useSelector((state: DefaultRootState) => state);
+  const state = useSelector((state: DefaultRootState) => state.user);
+  const [userEmail, setUserEmail] = useState("")
+  const Router = useRouter()
+  const handleLink = path => Router.push(path)
 
   const check = () => {
     console.log(state);    
   }
 
-
   const login = () => {
-    console.log('login');    
+    handleLink('/component/Signup')
   }
 
   const logout = () => {
-    console.log('logout');    
+    dispatch(userSlice.actions.UPDATE_USER({ id:'', email:''}))
   }   
 
   const userStyle = {
@@ -98,22 +103,22 @@ const UserCheck = () => {
   }
 
   useEffect(() => {     
-    // getItem()
-  },[]) 
+    setUserEmail(state.user.email)
+  },[state.user]) 
 
   return (
     <>
       <Button onClick={statecheck} >State</Button>
-     { state.user && state.user.displayName ? 
-              <>          
-                <div style={userStyle}>
+     { state.user.email ? 
+              <span>          
+                <span style={userStyle}>
                   <p>ユーザー名：</p>
-                  <p style={userNameStyle}>{state.user.userName}</p>
-                </div>                  
+                  <p style={userNameStyle}>{userEmail}</p>
+                </span>                  
                 <Button onClick={logout} style={whiteMoji}><LockIcon />ログアウト</Button>                  
-              </>          
+              </span>          
               :
-              <Button onClick={login} style={whiteMoji}><LockOpenIcon />ログイン</Button>
+              <Link href="/component/Login/"><a><Button onClick={login} style={whiteMoji}><LockOpenIcon />ログイン</Button></a></Link>
             }   
     </>                
   )

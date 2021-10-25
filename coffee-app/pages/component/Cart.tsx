@@ -1,13 +1,13 @@
-import * as React from 'react';
-import type { VFC } from "react"
-import 'react-redux'
-import { StoreState, CartState, CartItemListState } from '../../src/type/type'
-
 // react
 import { DefaultRootState, useDispatch, useSelector } from "react-redux";
 import { useState, useEffect } from "react";
-// import { GetCoffeeById, GetToppingById } from '../../src/components/Items'
+import * as React from 'react';
+import type { VFC } from "react"
+import 'react-redux'
+// next
 import Router from 'next/router'
+// component
+import { StoreState, CartState, CartItemListState } from '../../src/type/type'
 import { userSlice } from '../../src/store/slice/slice';
 
 // material ui
@@ -41,7 +41,7 @@ const Cart: VFC = () => {
     // newCarts.cartItemList = newCartItemList
     
     // ログインしている場合
-    if(state.user && state.user.uid){
+    if(state.user.id){
       dispatch(userSlice.actions.UPDATE_CARTITEMLIST(newCartItemList))
     }else{
       dispatch(userSlice.actions.UPDATE_CARTITEMLIST(newCartItemList))

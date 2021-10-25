@@ -1,12 +1,16 @@
-// ts
+// react
 import * as React from 'react';
 import type { VFC } from "react"
 import 'react-redux'
-import { CoffeeState, ToppingState, StoreState } from '../../../src/type/type'
+// next
 import { useRouter } from "next/router";
 import Router from 'next/router'
-import axios from 'axios'
+// component
+import { CoffeeState, ToppingState, StoreState, UserDataState } from '../../../src/type/type'
 import { userSlice } from '../../../src/store/slice/slice';
+import { cartUpdateByApi } from '../../../src/api/axios'
+
+import axios from 'axios'
 
 // material ui
 import Button from '@material-ui/core/Button' 
@@ -30,6 +34,7 @@ const ItemDetail: VFC = () =>{
 
     const [dispTopping, setDispTopping] = useState<Array<ToppingState>>([])
     const [selectCoffee, setSelectCoffee] = useState<CoffeeState>({})
+    const [getUser, setGetUser] = useState<UserDataState>({})
     let [choiceTopping, setChoiceTopping] = useState<Array<string>>([])
     let [sizeChoice, setSizeChoice] = useState<string>("")
     let [quantityChoise, setQuantityChoise] = useState<string>("")
@@ -77,11 +82,7 @@ const ItemDetail: VFC = () =>{
                 sizePrice= "priceM"
             }else if(sizeChoice === "L"){
                 sizePrice= "priceL"
-            }
-
-            // let subtotal = selectCoffee["coffee_" + sizePrice]
-            // subtotal += choiceTopping[0]["topping_" + sizePrice] * choiceTopping.length || 0 
-            // subtotal *= Number(quantityChoise)
+            }            
 
             let allSelects = {  Itemid: selectCoffee.id, 
                                 item_number: Number(quantityChoise),
@@ -93,14 +94,24 @@ const ItemDetail: VFC = () =>{
                               }     
             
             // ログインしていた場合はFirebase、storeを更新
-            if(state.user && state.user.uid){
-                dispatch(userSlice.actions.ADD_CARTITEMLIST(allSelects))
-            
+            if(state.user.email){
+                cartUpdateByApi({ item_number: allSelects.item_number, 
+                                  coffee_id: allSelects.Itemid,
+                                  item_size: allSelects.price
+                                })
+                .then(res => {
+                    console.log(res);                    
+                    dispatch(userSlice.actions.ADD_CARTITEMLIST(allSelects))    
+                })                
             // ログインしていない場合はstore飲み更新
             }else{
-                dispatch(userSlice.actions.ADD_CARTITEMLIST(allSelects))                
+                cartUpdateByApi({ user: getUser.id })
+                .then(res => {
+                    console.log(res);                    
+                    dispatch(userSlice.actions.ADD_CARTITEMLIST(allSelects))    
+                })
             }  
-            handleLink('/component/Cart')
+            // handleLink('/component/Cart')
         }                
     }
     
@@ -125,6 +136,10 @@ const ItemDetail: VFC = () =>{
     useEffect(() => {        
         setDispTopping(state.Topping)
     },[state.Topping])
+
+    useEffect(() => {
+        setGetUser(state.user)
+    },[state.user])
 
     return (
         <Card style={mainview}>
