@@ -117,7 +117,7 @@ const Signup = () => {
             className={classes.loginBtn}
             type="submit"
            >
-            SignUp
+            会員登録
           </Button>
         </CardActions>
       </Card>

@@ -4,8 +4,9 @@ import { useDispatch, useSelector, DefaultRootState } from "react-redux";
 import React, { useState, useEffect } from "react";
 import { AppProps } from 'next/app';
 import { Provider } from 'react-redux';
-import createStore from '../src/store/createStore';
+import store from '../src/store/createStore';
 import { StoreState } from '../src/type/type'
+import { UPDATE_USER } from '../src/store/slice/slice'
 
 // material ui
 import theme from './theme'
@@ -47,18 +48,12 @@ const UserCheck = () => {
   const dispatch = useDispatch();
   const state = useSelector((state: DefaultRootState) => state);
 
-  const check = () => {
-    console.log(state);    
-  }
-
-
-  const login = () => {
-    console.log('login');    
-  }
+  const user = state.user.user
+  console.log(user)
 
   const logout = () => {
-    console.log('logout');    
-  }   
+    dispatch(UPDATE_USER({}))
+  }  
 
   const userStyle = {
     display: 'inline',
@@ -77,16 +72,16 @@ const UserCheck = () => {
 
   return (
     <>
-     { state.user && state.user.displayName ? 
+     { user && user.token  ? 
               <>          
                 <div style={userStyle}>
                   <p>ユーザー名：</p>
-                  <p style={userNameStyle}>{state.user.userName}</p>
+                  <p style={userNameStyle}>{user.user.email}</p>
                 </div>                  
                 <Button onClick={logout} style={whiteMoji}><LockIcon />ログアウト</Button>                  
               </>          
               :
-              <Link href="/component/Login/"><a><Button onClick={login} style={whiteMoji}><LockOpenIcon />ログイン</Button></a></Link>
+              <Link href="/component/Login/"><a><Button style={whiteMoji}><LockOpenIcon />ログイン</Button></a></Link>
             }   
     </>                
   )
@@ -102,7 +97,7 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
   }, []);
 
   return (
-    <Provider store={createStore()}>
+    <Provider store={store}>
       <ThemeProvider theme={theme}>
       <div className="App">        
         <AppBar>          

@@ -32,10 +32,9 @@ export const userSlice = createSlice({
                 cart: { ...state.cart, cartItemList: action.payload }
             };  
         },
-        UPDATE_USER(state, action: PayloadAction<any>){
-            console.log(action);            
+        UPDATE_USER(state, action: PayloadAction<any>){    
             return { ...state,
-                user: action.payload.user
+                user: action.payload
             }
         },
         ADD_ORDERHISTORY(state, action: PayloadAction<CartState>){
@@ -58,7 +57,9 @@ export const userSlice = createSlice({
             if(action.payload.topping) return { ...state,Topping: action.payload.topping }           
         }
     },
-  })
+})
+
+export const { UPDATE_USER } = userSlice.actions
 
 // ここまで
 
@@ -74,3 +75,5 @@ export const userSlice = createSlice({
     tel:'',
     couponCode:''
   }                  
+
+export default userSlice.reducer

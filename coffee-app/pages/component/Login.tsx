@@ -1,9 +1,9 @@
-import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import  Link  from 'next/link'
 import { useRouter } from 'next/router'
 import axios from 'axios'
-
+import { useDispatch, useSelector } from "react-redux";
+import { UPDATE_USER } from '../../src/store/slice/slice'
 
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 
@@ -13,6 +13,8 @@ import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
 import CardHeader from '@material-ui/core/CardHeader';
 import Button from '@material-ui/core/Button';
+import { useState } from 'react';
+
 
 type submit = {
     email: string;
@@ -43,20 +45,24 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
+// declare module 'react-redux' {
+//   interface DefaultRootState extends StoreState {}
+// }
+
+
 const Login = () => {
   const classes = useStyles();
-
   const router = useRouter()
+  const dispatch = useDispatch()
 
   const {register,handleSubmit} = useForm()
   const onSubmit = (data: submit) => {
-      console.log(data)
       axios.post('http://localhost:8000/api/rest-auth/login/',{
           email: data.email,
           password: data.password,
       })
       .then(res => {
-          console.log(res.data)
+          dispatch(UPDATE_USER(res.data))
           router.push('/')
       }) 
       .catch(err => {
@@ -64,14 +70,13 @@ const Login = () => {
       })
   }
 
-
   return (
     <>
     <h1>ログイン</h1>
     <div>会員登録は <Link href="/component/Signup/"><a>こちらから</a></Link></div>
     <form className={classes.container} onSubmit={handleSubmit(onSubmit)}>
       <Card className={classes.card}>
-        <CardHeader className={classes.header} title="Login" />
+        <CardHeader className={classes.header} title="ログイン" />
         <CardContent>
           <div>
             <TextField
@@ -103,7 +108,7 @@ const Login = () => {
             className={classes.loginBtn}
             type="submit"
            >
-            Login
+            ログイン
           </Button>
         </CardActions>
       </Card>
