@@ -5,75 +5,60 @@ export type userState = {
     Coffee: CoffeeState | [],
     Topping: ToppingState | [],
     user: any,
-    cart: CartState | {},
-    orderhistory: OrderhistoryState | []
+    cart: CartState ,
+    orderhistory: OrderhistoryState
 }
 
+export const newCart: CartState = {
+    addressNumber: '',
+    address:'',
+    cartItemList:[],
+    email:'',
+    order_name:'',
+    order_date:'',
+    order_time:'',
+    status:0,
+    tel:'',    
+  }  
+
 export const initialState: userState = {
-    Coffee:[],
-    Topping:[],  
+    Coffee: [],
+    Topping: [],  
     user: {},      
-    cart:{},
-    orderhistory:[]
+    cart: newCart,
+    orderhistory: [],
 } 
 
 export const userSlice = createSlice({
     name: 'user',
-    initialState,
-    // HACK: reducerは肥大化したらファイル分けたくなるかも
+    initialState,    
     reducers: {
+        NEW_CART(state) {
+            state.cart = newCart
+        },
         UPDATE_CART(state, action: PayloadAction<CartState>) {
-            return { ...state,
-                cart: action.payload,
-            };
+            state.cart = action.payload       
         },
-        UPDATE_CARTITEMLIST(state, action: PayloadAction<CartItemListState>){
-            return { ...state,
-                cart: { ...state.cart, cartItemList: action.payload }
-            };  
+        UPDATE_CARTITEMLIST(state, action: PayloadAction<Array<CartItemListState>>){
+            state.cart.cartItemList = action.payload
         },
-        UPDATE_USER(state, action: PayloadAction<any>){    
-            return { ...state,
-                user: action.payload
-            }
+        ADD_CARTITEMLIST(state, action: PayloadAction<CartItemListState>){            
+            state.cart.cartItemList.push(action.payload)            
+        },
+        UPDATE_USER(state, action: PayloadAction<any>){  
+            console.log(action.payload)          
+            state.user = action.payload                        
         },
         ADD_ORDERHISTORY(state, action: PayloadAction<CartState>){
-            return { ...state,
-                orderhistory: [...state.orderhistory, action.payload]
-            };
-        },
-        CREATE_CART(state, action: PayloadAction<CartState>){
-            return { ...state,
-                cart: action.payload
-            }
+            state.orderhistory.push(action.payload)            
         },
         FETCH_CART(state, action: PayloadAction<CartState>){
-            return { ...state,
-                cart: action.payload
-            }
+            state.cart = action.payload            
         },
-        FETCH_ITEM(state, action: PayloadAction<any>){
-            if(action.payload.coffee) return { ...state,Coffee: action.payload.coffee }
-            if(action.payload.topping) return { ...state,Topping: action.payload.topping }           
+        FETCH_ITEM(state, action: PayloadAction<any>){                       
+            if(action.payload.Coffee) state.Coffee = action.payload.Coffee 
+            if(action.payload.Topping) state.Topping = action.payload.Topping
         }
     },
-})
-
-export const { UPDATE_USER } = userSlice.actions
-
-// ここまで
-
-  export const newCart = {
-    addNumber:'',
-    address:'',
-    cartItemList:[],
-    email:'',
-    name:'',
-    orderDate:'',
-    orderTime:0,
-    status:0,
-    tel:'',
-    couponCode:''
-  }                  
-
-export default userSlice.reducer
+  })
+                

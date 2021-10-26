@@ -1,17 +1,21 @@
 import * as React from 'react';
-import type { VFC } from "react"
-import 'react-redux'
-import { StoreState, CoffeeState } from '../src/type/type'
-import Link from 'next/link'
-import { userSlice } from '../src/store/slice/slice'
-import { NextPage } from "next";
-
 import { useState, useEffect } from 'react'
+import type { VFC } from "react"
+import { DefaultRootState, useSelector, useDispatch } from 'react-redux';
+import 'react-redux'
+
+import Link from 'next/link'
+import { NextPage } from "next";
+import { useRouter } from 'next/router'
+
+import axios from 'axios'
+
+import { userSlice } from '../src/store/slice/slice';
+import { getItemByApi } from '../src/api/axios'
+import { StoreState, CoffeeState } from '../src/type/type'
+
 import Button from '@material-ui/core/Button';
 import SearchSharp from '@material-ui/icons/SearchSharp';
-import { DefaultRootState, useSelector, useDispatch } from 'react-redux';
-import { GetItemById } from '../src/components/Items'
-
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -48,20 +52,20 @@ const useStyles = makeStyles((theme) => ({
     },
   }));  
 
-// interface Props {
-//     testData: string
-// }
+interface Props {
+    Coffee: Array<CoffeeState>
+}
 
-const ItemView = () => {
-    const state = useSelector((state: DefaultRootState ) => state)
+const ItemView: NextPage<Props>= (props) => {
+    const state = useSelector((state: DefaultRootState ) => state.user)
     const dispatch = useDispatch();
     const [word, setWord] = useState<string>('')      
-    const [search, setSearch] = useState<Array<CoffeeState>>([])
+    const [search, setSearch] = useState<Array<CoffeeState>>([]) // props.Coffee)
     const [searhResult, setSearchResult]  = useState<string>('商品を検索できます')
     const getToday = new Date()
     const now = { year: getToday.getFullYear(), month: getToday.getMonth() + 1, day: getToday.getDate(), hours: getToday.getHours()}
-
     const classes = useStyles();    
+    const [test, setTest] = useState<Array<CoffeeState>>(props.Coffee)
 
     const type=(e: React.ChangeEvent<HTMLInputElement>)=>{
         setWord(e.target.value)
@@ -101,12 +105,18 @@ const ItemView = () => {
         color: "red"
     }
 
-    const stateCheck = () => {              
-    // dispatch(userSlice.actions.UPDATE_USER({ user:'test'}))
-    }
+    const fetchItem = async () => {
+        let getData = await getItemByApi()
+        dispatch(userSlice.actions.FETCH_ITEM({Coffee: getData.Coffee}))
+        dispatch(userSlice.actions.FETCH_ITEM({Topping: getData.Topping}))
+      }
+    
+    useEffect(() => {
+        fetchItem()
+    },[]) 
 
     useEffect(() => {
-        // setSearch(state.Coffee)
+        setSearch(state.Coffee)
     },[state.Coffee])
 
     return(
@@ -131,17 +141,16 @@ const ItemView = () => {
                 <TableBody>
                     <TableRow>
                     <TableCell>
-                    <div className={classes.root}>                        
-                        <Button onClick={stateCheck}>stateCheck</Button>
+                    <div className={classes.root}>                                              
                         <ImageList rowHeight={240} className={classes.imageList}>
                             <ImageListItem key="Subheader" cols={2} style={{ height: 'auto' }}>
                                 <ListSubheader component="div">{searhResult}</ListSubheader>
                             </ImageListItem>
                             {search.map((val3,index)=>{
                                 return(
-                                    <Link href={`/component/itemdetail/${val3.id}`} >
-                                      <ImageListItem key={index}>
-                                        <img src={`${window.location.origin}/${val3.image}`} width="100%" alt="商品" />
+                                    // <Link href={`/component/itemdetail/${val3.id}`} >
+                                      <ImageListItem key={index}>                                        
+                                        <img src={val3.img} width="100%" alt="商品" />
                                         <ImageListItemBar
                                             title={val3.coffee_name}
                                             subtitle={(
@@ -151,13 +160,15 @@ const ItemView = () => {
                                                 </>
                                                 )}
                                             actionIcon={
-                                                <IconButton aria-label={`info about ${val3.coffee_name}`} className={classes.icon}>
-                                                    <InfoIcon />
-                                                </IconButton>
+                                                <Link href="/component/ItemDetail/[id]" as={`/component/ItemDetail/${val3.id}`} >
+                                                    <IconButton aria-label={`info about ${val3.coffee_name}`} className={classes.icon}>
+                                                        <InfoIcon />
+                                                    </IconButton>
+                                                </Link>
                                             }
                                         />
                                       </ImageListItem>
-                                    </Link>
+                                    // </Link>
                                 )
                             })}
                         </ImageList>
@@ -172,17 +183,17 @@ const ItemView = () => {
     )}
 
 // ItemView.getInitialProps = async () => {
-//     let testData = ''
+//     let Coffee ;    
 //     await new Promise((resolve, reject) => {
-//         setTimeout(() => {
-//             testData = 'change'
-//             resolve()
-//         }, 1000)        
-//     })        
+//         axios.get('http://127.0.0.1:8000/api/coffee/'          
+//         ).then(res =>{              
+//             Coffee = res.data
+//             console.log('getinitial');            
+//             resolve(res)
+//           })  
+//     })
     
-//     console.log('check');
-    
-//     return { testData };
+//     return { Coffee };
 // }
 
 export default ItemView

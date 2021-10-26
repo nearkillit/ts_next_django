@@ -3,7 +3,9 @@ import  Link  from 'next/link'
 import { useRouter } from 'next/router'
 import axios from 'axios'
 import { useDispatch, useSelector } from "react-redux";
-import { UPDATE_USER } from '../../src/store/slice/slice'
+// import { UPDATE_USER } from '../../src/store/slice/slice'
+import { userSlice } from '../../src/store/slice/slice';
+
 
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 
@@ -62,8 +64,18 @@ const Login = () => {
           password: data.password,
       })
       .then(res => {
-          dispatch(UPDATE_USER(res.data))
-          router.push('/')
+        dispatch(userSlice.actions.UPDATE_USER(res.data))
+        axios.post('http://127.0.0.1:8000/api/cart/', res.data,{
+          headers: {
+            Authorization: `JWT ${res.data.token}`
+          }
+        })
+        axios.get('http://127.0.0.1:8000/api/cart/',{
+          headers: {
+            Authorization: `JWT ${res.data.token}`
+          }
+        }).then(res => console.log(res.data))
+        // router.push('/')
       }) 
       .catch(err => {
           alert("入力されたEmailもしくはパスワードが異なります")

@@ -1,7 +1,10 @@
-import { Store, combineReducers } from 'redux';
-import logger from 'redux-logger';
+import { Store, combineReducers, createStore } from 'redux';
+// import logger from 'redux-logger';
 import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
 import { userSlice, initialState } from './slice/slice';
+import { compose, applyMiddleware } from 'redux';
+import thunk from 'redux-thunk';
+import persistState from "redux-localstorage";
 
 const rootReducer = combineReducers({
   user: userSlice.reducer,
@@ -19,20 +22,15 @@ export type ReduxStore = Store<StoreState>;
 //   const middlewareList = [...getDefaultMiddleware()]//, logger];
 
 //   return configureStore({
-    // reducer: rootReducer,
-    // middleware: middlewareList,
-    // devTools: process.env.NODE_ENV !== 'production',
-    // preloadedState: preloadedState(),
+//     reducer: rootReducer,
+//     middleware: middlewareList,
+//     devTools: process.env.NODE_ENV !== 'production',
+//     preloadedState: preloadedState(),
 //   });
 // };
 
-const middlewareList = [...getDefaultMiddleware(), logger]
-const store = configureStore({
-  reducer: rootReducer,
-  middleware: middlewareList,
-  devTools: process.env.NODE_ENV !== 'production',
-  preloadedState: preloadedState(),
-})
+const enhancer = compose(persistState(['user'], { key: 'user' }))//,applyMiddleware(thunk));
 
+const store = createStore(rootReducer,enhancer);
 
 export default store;

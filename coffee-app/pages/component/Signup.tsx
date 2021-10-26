@@ -1,12 +1,14 @@
 import { useState } from 'react'
+import { useDispatch } from 'react-redux'
 import { useForm } from 'react-hook-form'
 import  Link  from 'next/link'
 import { useRouter } from 'next/router'
 import axios from 'axios'
 
-
-
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import { SignUpState } from '../../src/type/type'
+import { signUpByApi } from '../../src/api/axios'
+import { userSlice } from '../../src/store/slice/slice';
 
 import TextField from '@material-ui/core/TextField';
 import Card from '@material-ui/core/Card';
@@ -14,13 +16,6 @@ import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
 import CardHeader from '@material-ui/core/CardHeader';
 import Button from '@material-ui/core/Button';
-
-type submit ={
-    email: string;
-    password1: string;
-    password2: string;
-}
-
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -47,26 +42,21 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const Signup = () => {
   const classes = useStyles();
-
-  const router = useRouter()
+  const dispatch = useDispatch()
+  const Router = useRouter()
+  const handleLink = path => Router.push(path)
 
   const {register,handleSubmit,formState: {errors}} = useForm()
-  const onSubmit = (data: submit) => {
+  const onSubmit = async (data: SignUpState) => {
       if(data.password1 !== data.password2){
-          alert("入力されたパスワードが異なります")
+        alert("入力されたパスワードが異なります")
       } else {
-          axios.post('http://localhost:8000/api/rest-auth/registration/',{
-          email: data.email,
-          password1: data.password1,
-          password2: data.password2
-      })
-      .then(() => {
-          alert('新規登録が完了しました。ログイン画面よりログインしてください。')
-          router.push('/component/Login/')
-      })
-      .catch(err => {
-          alert('パスワードは8文字以上必要です。')
-      })
+        signUpByApi(data).then(res => {
+          dispatch(userSlice.actions.UPDATE_USER(res.data.user))
+          handleLink('/')
+        }).catch(err => {
+          console.log(err);
+        })        
       }
   }
 

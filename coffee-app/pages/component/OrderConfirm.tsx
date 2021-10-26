@@ -1,15 +1,18 @@
-// ts
+// react
 import * as React from 'react';
 import type { VFC } from "react"
 import 'react-redux'
-import { StoreState, ToppingState, CartItemListState } from '../../src/type/type'
-
 import { DefaultRootState, useDispatch, useSelector } from "react-redux";
 import { useState, useEffect } from "react";
+// next
+import Router from 'next/router'
+// component
+import { StoreState, ToppingState, CartItemListState } from '../../src/type/type'
+import { userSlice } from '../../src/store/slice/slice';
 
 // components
 // import { newCart } from '../store/index'
-import { GetItemById } from '../../src/components/Items'
+// import { GetItemById } from '../../src/components/Items'
 // material ui
 import Button from '@material-ui/core/Button';
 import Table from '@material-ui/core/Table';
@@ -56,7 +59,8 @@ const OrderConfirm: VFC = () => {
 
   //firebase ここから
   const dispatch = useDispatch();
-  const state = useSelector((state: DefaultRootState ) => state)  
+  const state = useSelector((state: DefaultRootState ) => state.user)  
+  const handleLink = path => Router.push(path)
 
   const getAddress = () => {  
     
@@ -83,10 +87,10 @@ const OrderConfirm: VFC = () => {
   const AddCartFire = (by) => {
 
     // by = 購入者情報
-    const newOrder = Object.assign(by,{ cartItemList: state.cart.cartItemList } )   // coupon追加するならここ           
-    // sendMail(newOrder)
-    // MakeReceipt(newOrder)
+    const newOrder = Object.assign(by,{ cartItemList: state.cart.cartItemList } )   
 
+    dispatch(userSlice.actions.NEW_CART())
+    dispatch(userSlice.actions.ADD_ORDERHISTORY(newOrder))
     // // add history
     // firebase.firestore()
     //         .collection(`users/${state.user.uid}/carts`)
@@ -106,7 +110,7 @@ const OrderConfirm: VFC = () => {
     //             newCarts.cartItemList = []
     //             dispatch({ type:'CREATE_CART', payload:{ cart: newCarts }})
     //           })
-    // handleLink('orderfinish')
+    handleLink('/component/OrderFinish')
   }
 
   const changeName = (e) => {
@@ -261,35 +265,38 @@ const validOrderdate=(orderDate)=>{
     if (allError.length === 0) {
         let objName = {name:name}
         let objEmail = {email:email}
-        let objAddnumber = {addNumber:addNumber}
+        let objAddnumber = {addressNumber:addNumber}
         let objAddress = {address:address}
-        let objOrderDate = {orderDate:orderDate}
-        let objOrderTime = {orderTime:orderTime}
+        let objOrderDate = {order_date:orderDate}
+        let objOrderTime = {order_time:orderTime}
         let objTel = {tel:tel}
         let objStatus = {status:status}
 
-        let BuyerObj =Object.assign({},objName, objEmail, objAddnumber,objAddress,objOrderDate,objOrderTime,objTel,objStatus);
-        // setBuyer(BuyerObj);
+        let BuyerObj =Object.assign({},objName, 
+                                      objEmail, 
+                                      objAddnumber,
+                                      objAddress,
+                                      objOrderDate,
+                                      objOrderTime,
+                                      objTel,
+                                      objStatus);
 
         AddCartFire(BuyerObj)
     }
   };
 
-  useEffect(()=>{
-    let newCartItemList = state.cart ? state.cart.cartItemList : undefined 
+  useEffect(()=>{    
+    let newCartItemList: Array<CartItemListState> = state.cart.cartItemList
     if(newCartItemList){
-      // cartのIDを全て商品情報に変換 Item, Topping, subtotal を追加
-
+      // subtotal を追加
       newCartItemList = newCartItemList.map( c => {
-        c.Coffee = GetItemById(c.Itemid, state.Coffee)
-        c.Topping = c.topping_id.map( t => GetItemById(t, state.Topping) )
-        c.subtotal = ( c.Coffee[c.price] + c.Topping.reduce((ac,cu) => ac + cu[c.price],0)) * c.item_number    
-        return c
-      })     
-      setCartItemList(newCartItemList)      
-    }
-    else{
-      // handleLink('/cart')
+        let cc = Object.assign({},c)
+        cc.subtotal = ( c.Coffee["coffee_" + c.price] + c.Topping.reduce((ac,cu) => ac + cu["topping_" + c.price],0)) * c.item_number
+        return cc
+      })            
+      setCartItemList(newCartItemList)
+    }else{
+      handleLink('/component/Cart')
     }
   },[state.cart])
 
@@ -329,15 +336,15 @@ const validOrderdate=(orderDate)=>{
             return (
             <TableRow key={index}>                
               <TableCell component="th" scope="row">                
-                <img src={`${window.location.origin}/${c.Coffee.image}`} height="100px" alt="商品" style={{borderRadius:5}}/>
+                <img src={c.Coffee.img} height="100px" alt="商品" style={{borderRadius:5}}/>
                 <span>{c.Coffee.coffee_name}</span>  
               </TableCell>
-              <TableCell>{c.price.replace('price','') + 'サイズ'}、{c.Coffee[c.price]}円、{c.item_number}個</TableCell>
+              <TableCell>{c.price.replace('price','') + 'サイズ'}、{c.Coffee["coffee_" + c.price]}円、{c.item_number}個</TableCell>
               <TableCell>
                 <ul>
                 {c.Topping.map((t,i) => {
                   return (
-                    <li key={i}>{t.topping_name}、{t[c.price]}円</li>
+                    <li key={i}>{t.topping_name}、{t["topping_" + c.price]}円</li>
                   )
                 })}
                 </ul>

@@ -1,17 +1,21 @@
 // react
-import Link from 'next/link'
 import { useDispatch, useSelector, DefaultRootState } from "react-redux";
 import React, { useState, useEffect } from "react";
-import { AppProps } from 'next/app';
 import { Provider } from 'react-redux';
+// next
+import Link from 'next/link'
+import { AppProps } from 'next/app';
+import { useRouter } from 'next/router'
+// component
 import store from '../src/store/createStore';
+import { userSlice } from '../src/store/slice/slice';
 import { StoreState } from '../src/type/type'
-import { UPDATE_USER } from '../src/store/slice/slice'
+// import { UPDATE_USER } from '../src/store/slice/slice'
 
 // material ui
 import theme from './theme'
 import { ThemeProvider } from '@material-ui/core/styles'
-import { CssBaseline } from '@material-ui/core'
+import { CssBaseline, useRadioGroup } from '@material-ui/core'
 import Button from '@material-ui/core/Button';
 import { AppBar } from "@material-ui/core";
 // material ui icon
@@ -46,14 +50,22 @@ function HistoryApp(props){
 
 const UserCheck = () => {
   const dispatch = useDispatch();
-  const state = useSelector((state: DefaultRootState) => state);
+  const state = useSelector((state: DefaultRootState) => state.user);
+  const [userEmail, setUserEmail] = useState("")
+  const Router = useRouter()
+  const handleLink = path => Router.push(path)
 
-  const user = state.user.user
-  console.log(user)
+  const check = () => {
+    console.log(state);    
+  }
+
+  const login = () => {
+    handleLink('/component/Signup')
+  }
 
   const logout = () => {
-    dispatch(UPDATE_USER({}))
-  }  
+    dispatch(userSlice.actions.UPDATE_USER({}))
+  }   
 
   const userStyle = {
     display: 'inline',
@@ -70,19 +82,46 @@ const UserCheck = () => {
     color: "white"
   }
 
+  const statecheck = () => {
+    console.log(state);    
+  }
+
+  const getItem = async () => {
+    await new Promise((resolve, reject) => {
+      axios.get('http://127.0.0.1:8000/api/coffee/'          
+      ).then(res =>{  
+          // console.log(res);
+          dispatch(userSlice.actions.FETCH_ITEM({Coffee: res.data}))
+
+          axios.get('http://127.0.0.1:8000/api/topping/'          
+          ).then(_res =>{          
+            dispatch(userSlice.actions.FETCH_ITEM({Topping: _res.data}))
+            resolve(_res)
+          })           
+          resolve(res)
+      })  
+    })
+  }
+
+  useEffect(() => {     
+    setUserEmail(state.user.email)
+  },[state.user]) 
+  console.log(state.user)
+
   return (
     <>
-     { user && user.token  ? 
-              <>          
-                <div style={userStyle}>
+      <Button onClick={statecheck} >State</Button>
+     { state.user && state.user.user ? 
+              <span>          
+                <span style={userStyle}>
                   <p>ユーザー名：</p>
-                  <p style={userNameStyle}>{user.user.email}</p>
-                </div>                  
+                  <p style={userNameStyle}>{userEmail}</p>
+                </span>                  
                 <Button onClick={logout} style={whiteMoji}><LockIcon />ログアウト</Button>                  
-              </>          
+              </span>          
               :
               <Link href="/component/Login/"><a><Button style={whiteMoji}><LockOpenIcon />ログイン</Button></a></Link>
-            }   
+      }
     </>                
   )
 }
@@ -101,13 +140,13 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
       <ThemeProvider theme={theme}>
       <div className="App">        
         <AppBar>          
-          {/* <div className='App-header1'>
+          <div className='App-header1'>
             <HistoryApp tag='button_img' link='/' context={`/header_logo.png`}  />        
-          </div> */}
+          </div>
           <span className='App-header2' >
             <UserCheck />
-            <HistoryApp tag='button' link='/cart' icon={<ShoppingCartIcon />} name='カート'/>
-            <HistoryApp tag='button' link='/orderhistory' icon={<HistoryIcon />} name='注文履歴'/>           
+            <HistoryApp tag='button' link='/component/Cart' icon={<ShoppingCartIcon />} name='カート'/>
+            <HistoryApp tag='button' link='/component/OrderHistory' icon={<HistoryIcon />} name='注文履歴'/>           
           </span> 
         </AppBar>               
       </div>

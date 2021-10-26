@@ -6,7 +6,6 @@ import { StoreState } from '../../src/type/type'
 
 import { DefaultRootState, useSelector } from "react-redux";
 import { useState, useEffect } from "react";
-import { GetItemById } from '../../src/components/Items'
 
 // material ui
 import Table from '@material-ui/core/Table';
@@ -23,33 +22,19 @@ declare module 'react-redux' {
 }
 
 const OrderHistory: VFC = () => {
-  const state = useSelector((state: DefaultRootState ) => state)
+  const state = useSelector((state: DefaultRootState ) => state.user)
   const [order, setOrder] = useState<Array<any>>([])
 
-  useEffect(()=>{    
-    let getOrder = state.orderhistory   
- 
-    if( state.orderhistory && state.orderhistory.length !== 0){
-      // cartのIDを全て商品情報に変換 Item, Topping, subtotal を追加
-      getOrder = state.orderhistory.map( o => { 
-        o.cartItemList = o.cartItemList.map(c => {            
-            c.Coffee = GetItemById(c.Itemid, state.Coffee)
-            c.Topping = c.topping_id.map( t => GetItemById(t, state.Topping) )
-            c.subtotal = ( c.Coffee[c.price] +  ( c.Topping.length !==0 && c.Topping.reduce((ac,cu) => ac + cu[c.price],0))) * c.item_number
-            return c
-        })        
-        return o        
-      })      
-      setOrder(getOrder)
-    }            
-  },[state])  
+  useEffect(()=>{
+      setOrder(state.orderhistory)            
+  },[state.orderhistory])
 
   return (
     <div>
       <p></p>
       <h2>過去のご注文履歴</h2>
     <TableContainer component={Paper}>
-    {state.user.uid ? 
+    {state.user ? 
       order.length !== 0 ? 
         order.map((o,i) => (
         <Table key={i} aria-label="simple table">
@@ -66,15 +51,15 @@ const OrderHistory: VFC = () => {
               return (
               <TableRow key={index}>
                 <TableCell component="th" scope="row">
-                  <img src={`${window.location.origin}/${c.Item.image}`} height="100px" alt="商品" style={{borderRadius:5}}/>
-                  {c.Item.name}
+                  <img src={c.Coffee.img} height="100px" alt="商品" style={{borderRadius:5}}/>
+                  {c.Coffee.coffee_name}
                 </TableCell>
-                <TableCell>{c.price.replace('price','') + 'サイズ'}、{c.Item[c.price]}円、{c.number}個</TableCell>              
+                <TableCell>{c.price.replace('price','') + 'サイズ'}、{c.Coffee["coffee_" + c.price]}円、{c.item_number}個</TableCell>              
                 <TableCell>
                   <ul>                     
                   {c.Topping.map((t,i) => {                  
                     return (
-                      <li key={i}>{t.name}、{t[c.price]}円</li>
+                      <li key={i}>{t.topping_name}、{t["topping_" + c.price]}円</li>
                     )
                   })}
                   </ul> 

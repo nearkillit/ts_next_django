@@ -11,8 +11,8 @@ export type StoreState = {
 
 export type CoffeeState = {
     coffee_detail: string,
-    id: number,
-    image: string,
+    id: string,
+    img: string,
     coffee_name: string,
     coffee_priceL: number,
     coffee_priceM: number,
@@ -20,7 +20,7 @@ export type CoffeeState = {
 }
 
 export type ToppingState = {    
-    id: number,    
+    id: string,    
     topping_name: string,
     topping_priceL: number,
     topping_priceM: number,
@@ -33,17 +33,16 @@ export type CouponState = {
 
 export type TimeSaleState = {
     deadline: string,
-    Itemid: number,
+    Itemid: string,
     couponCode: string
 }
 
 export type CartItemListState = {    
-    Itemid: number,
-    // Topping: Array<ToppingState>,
+    Itemid: string,    
     item_number: number,
     price: string,
     subtotal: number,
-    topping_id: Array<number>,
+    topping_id?: Array<string>,
     Coffee?: CoffeeState,
     Topping?: Array<ToppingState>
 }
@@ -66,4 +65,15 @@ export type OrderhistoryState = CartState[]
 export type ItemState = {
     coffee: Array<CoffeeState>
     topping: Array<ToppingState>
+}
+
+export type SignUpState = {
+    email: string,    
+    password1: string,
+    password2: string
+}
+
+export type UserDataState = {
+    email: string,
+    id: string
 }

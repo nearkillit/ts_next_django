@@ -173,3 +173,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # sitesフレームワークの1つでいくつかのDjangoプロジェクトから複数のWebサイトをホストするためのID
 SITE_ID = 1
+
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:3001',
+    'http://127.0.0.1:3001',    
+]
