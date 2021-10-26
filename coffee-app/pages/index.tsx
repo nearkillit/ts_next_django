@@ -11,7 +11,7 @@ import { useRouter } from 'next/router'
 import axios from 'axios'
 
 import { userSlice } from '../src/store/slice/slice';
-import { getItemByApi } from '../src/api/axios'
+// import { getItemByApi } from '../src/api/axios'
 import { StoreState, CoffeeState } from '../src/type/type'
 
 import Button from '@material-ui/core/Button';
@@ -52,11 +52,24 @@ const useStyles = makeStyles((theme) => ({
     },
   }));  
 
-interface Props {
-    Coffee: Array<CoffeeState>
-}
+export async function getStaticProps() {
+    const coffee = await axios.get('http://127.0.0.1:8000/api/coffee/')
+    const topping = await axios.get('http://127.0.0.1:8000/api/topping/' )
+    const coffeeList = coffee.data
+    const toppingList = topping.data
+    return {
+      props: {
+        coffeeList,
+        toppingList
+      }
+    }
+  }
 
-const ItemView: NextPage<Props>= (props) => {
+// interface Props {
+//     Coffee: Array<CoffeeState>
+// }
+
+const ItemView = ({coffeeList, toppingList}) => {
     const state = useSelector((state: DefaultRootState ) => state.user)
     const dispatch = useDispatch();
     const [word, setWord] = useState<string>('')      
@@ -65,7 +78,7 @@ const ItemView: NextPage<Props>= (props) => {
     const getToday = new Date()
     const now = { year: getToday.getFullYear(), month: getToday.getMonth() + 1, day: getToday.getDate(), hours: getToday.getHours()}
     const classes = useStyles();    
-    const [test, setTest] = useState<Array<CoffeeState>>(props.Coffee)
+    // const [test, setTest] = useState<Array<CoffeeState>>(props.Coffee)
 
     const type=(e: React.ChangeEvent<HTMLInputElement>)=>{
         setWord(e.target.value)
@@ -105,11 +118,16 @@ const ItemView: NextPage<Props>= (props) => {
         color: "red"
     }
 
-    const fetchItem = async () => {
-        let getData = await getItemByApi()
-        dispatch(userSlice.actions.FETCH_ITEM({Coffee: getData.Coffee}))
-        dispatch(userSlice.actions.FETCH_ITEM({Topping: getData.Topping}))
-      }
+    // const fetchItem = async () => {
+    //     let getData = await getItemByApi()
+    //     dispatch(userSlice.actions.FETCH_ITEM({Coffee: getData.Coffee}))
+    //     dispatch(userSlice.actions.FETCH_ITEM({Topping: getData.Topping}))
+    //   }
+
+    const fetchItem = () => {
+        dispatch(userSlice.actions.FETCH_ITEM({Coffee: coffeeList}))
+        dispatch(userSlice.actions.FETCH_ITEM({Topping: toppingList}))
+    }
     
     useEffect(() => {
         fetchItem()
