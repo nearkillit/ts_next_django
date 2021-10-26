@@ -97,7 +97,8 @@ const ItemDetail: VFC = () =>{
             if(state.user.email){
                 cartUpdateByApi({ item_number: allSelects.item_number, 
                                   coffee_id: allSelects.Itemid,
-                                  item_size: allSelects.price
+                                  item_size: allSelects.price,
+                                  carts: state.user.id
                                 })
                 .then(res => {
                     console.log(res);                    
@@ -105,7 +106,11 @@ const ItemDetail: VFC = () =>{
                 })                
             // ログインしていない場合はstore飲み更新
             }else{
-                cartUpdateByApi({ user: getUser.id })
+                cartUpdateByApi({ item_number: allSelects.item_number, 
+                    coffee_id: allSelects.Itemid,
+                    item_size: allSelects.price,
+                    carts: state.user.id
+                  })
                 .then(res => {
                     console.log(res);                    
                     dispatch(userSlice.actions.ADD_CARTITEMLIST(allSelects))    

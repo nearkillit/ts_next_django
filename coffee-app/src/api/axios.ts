@@ -18,14 +18,12 @@ export const getItemByApi = async () => {
     return getData
 }
 
-export const signUpByApi = async (data: SignUpState) => {
-    let _res
+export const signUpByApi = async (data: SignUpState) => {    
 
     return await new Promise((resolve, reject) => {
       axios.post('http://localhost:8000/api/rest-auth/registration/', data)
         .then(res => {
-          alert('新規登録が完了しました。ログイン画面よりログインしてください。')
-          _res = res
+          alert('新規登録が完了しました。ログイン画面よりログインしてください。')          
           resolve(res)
       })
       .catch(err => {
@@ -38,7 +36,8 @@ export const signUpByApi = async (data: SignUpState) => {
 export type cartUpdateApi = {
     item_number: number,
     coffee_id: string,
-    item_size: string,    
+    item_size: string,   
+    carts: string 
 }
 
 export const cartUpdateByApi = async (data: cartUpdateApi) => {
@@ -51,4 +50,52 @@ export const cartUpdateByApi = async (data: cartUpdateApi) => {
             reject(err)          
           })
         })  
+}
+
+export type cartFetchApi = {
+    id: string
+}
+
+export const cartFetchByApi = async (data: cartFetchApi) => {
+    return await new Promise((resolve, reject) => {
+        axios.post('http://localhost:8000/api/cart/', { id: '41e1749d-8333-4eb5-a8e7-90e4fd628135'})
+          .then(res => {
+            resolve(res)
+        })
+        .catch(err => {            
+            reject(err)          
+          })
+        })  
+}
+
+export type loginState = {
+    email: string,
+    password: string
+}
+
+export const loginByApi = async (data: loginState) => { 
+    
+    return await new Promise((resolve, reject) => { 
+        axios.post('http://localhost:8000/api/rest-auth/login/',{
+          email: data.email,
+          password: data.password,
+        })
+        .then(res => {
+          console.log(res);          
+          axios.post('http://localhost:8000/api/cart/', res.data.user
+          ,{ headers: {
+              Authorization: `JWT ${res.data.token}`
+            }}
+            ).then( _res => {
+              resolve(_res.data)
+            })
+            .catch( _err => {
+              reject(_err)
+            })
+        }) 
+        .catch(err => {
+          alert("入力されたEmailもしくはパスワードが異なります")
+          reject(err)
+        })
+    })
 }

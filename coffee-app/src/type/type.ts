@@ -73,6 +73,11 @@ export type SignUpState = {
     password2: string
 }
 
+export type LoginState = {
+    email: string,
+    password: string
+}
+
 export type UserDataState = {
     email: string,
     id: string

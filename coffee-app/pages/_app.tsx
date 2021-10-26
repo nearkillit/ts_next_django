@@ -10,6 +10,7 @@ import { useRouter } from 'next/router'
 import store from '../src/store/createStore';
 import { userSlice } from '../src/store/slice/slice';
 import { StoreState } from '../src/type/type'
+import { cartFetchByApi } from '../src/api/axios'
 
 // material ui
 import theme from './theme'
@@ -85,21 +86,13 @@ const UserCheck = () => {
     console.log(state);    
   }
 
-  const getItem = async () => {
-    await new Promise((resolve, reject) => {
-      axios.get('http://127.0.0.1:8000/api/coffee/'          
-      ).then(res =>{  
-          // console.log(res);
-          dispatch(userSlice.actions.FETCH_ITEM({Coffee: res.data}))
-
-          axios.get('http://127.0.0.1:8000/api/topping/'          
-          ).then(_res =>{          
-            dispatch(userSlice.actions.FETCH_ITEM({Topping: _res.data}))
-            resolve(_res)
-          })           
-          resolve(res)
-      })  
-    })
+  const cartTest = async () => {
+    cartFetchByApi({ id:'f1edc096-8e6d-44a8-8098-c91a021112cc' })
+    .then(res => {
+      console.log(res)      
+    }).catch(err => {
+      console.log(err)
+    })      
   }
 
   useEffect(() => {     
@@ -109,6 +102,7 @@ const UserCheck = () => {
   return (
     <>
       <Button onClick={statecheck} >State</Button>
+      <Button onClick={cartTest} >test</Button>
      { state.user.email ? 
               <span>          
                 <span style={userStyle}>

@@ -28,7 +28,8 @@ class CartVieSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
     
-    def get_queryset(self):
+    def get_queryset(self):        
+        # return self.queryset.filter(user=self.request.GET.get('id'))
         return self.queryset.filter(user=self.request.user.id)
 
 

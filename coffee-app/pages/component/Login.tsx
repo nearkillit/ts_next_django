@@ -4,6 +4,8 @@ import  Link  from 'next/link'
 import { useRouter } from 'next/router'
 import axios from 'axios'
 
+import { LoginState } from '../../src/type/type'
+import { loginByApi } from '../../src/api/axios'
 
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 
@@ -50,18 +52,12 @@ const Login = () => {
 
   const {register,handleSubmit} = useForm()
   const onSubmit = (data: submit) => {
-      console.log(data)
-      axios.post('http://localhost:8000/api/rest-auth/login/',{
-          email: data.email,
-          password: data.password,
-      })
-      .then(res => {
-          console.log(res.data)
-          router.push('/')
-      }) 
-      .catch(err => {
-          alert("入力されたEmailもしくはパスワードが異なります")
-      })
+    loginByApi(data)
+    .catch(res => {
+      console.log(res);      
+    }).then(err => {
+      console.log(err);      
+    })
   }
 
 
