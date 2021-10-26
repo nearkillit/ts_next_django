@@ -63,19 +63,25 @@ const Login = () => {
           email: data.email,
           password: data.password,
       })
-      .then(res => {
+      .then(res => {       
         dispatch(userSlice.actions.UPDATE_USER(res.data))
-        axios.post('http://127.0.0.1:8000/api/cart/', res.data,{
-          headers: {
-            Authorization: `JWT ${res.data.token}`
-          }
-        })
         axios.get('http://127.0.0.1:8000/api/cart/',{
           headers: {
             Authorization: `JWT ${res.data.token}`
           }
-        }).then(res => console.log(res.data))
-        // router.push('/')
+        }).then(res1 => {
+          if(res1.data.length === 0){
+            axios.post('http://127.0.0.1:8000/api/cart/', res.data,{
+              headers: {
+                Authorization: `JWT ${res.data.token}`
+              }
+            }).then(res2 => console.log(res2.data))
+          } else {
+            console.log(res1)
+          }
+        })
+
+        router.push('/')
       }) 
       .catch(err => {
           alert("入力されたEmailもしくはパスワードが異なります")
