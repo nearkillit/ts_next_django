@@ -24,15 +24,16 @@ const OrderFinish: VFC = () => {
   const history = useHistory()
   const handleLink = (path: string) => history.push(path)
   
-  useEffect(()=>{
-    const buyUser = state.orderhistory[state.orderhistory.length - 1 ]
-    console.log(buyUser);
-    MakeReceipt(buyUser).then( res =>{      
-      setReceiptPDF(res) 
-    }).catch( err =>
-      console.log(err)
-    )           
-  },[state.orderhistory])
+  //　レシピの作成
+  // useEffect(()=>{
+  //   const buyUser = state.orderhistory[state.orderhistory.length - 1 ]
+  //   console.log(buyUser);
+  //   MakeReceipt(buyUser).then( res =>{      
+  //     setReceiptPDF(res) 
+  //   }).catch( err =>
+  //     console.log(err)
+  //   )           
+  // },[state.orderhistory])
 
   useEffect(()=>{
     if(!state.user.uid){
@@ -48,7 +49,7 @@ const OrderFinish: VFC = () => {
                 <h1>決済が完了しました！</h1>
                 <p>この度はご注文ありがとうございます。</p>
                 <p>お支払い先は、お送りしたメールに記載してありますのでご確認ください。</p>
-                {receiptPDF !== '' && <p><a href={receiptPDF}>領収書を表示</a></p>}                
+                {/* {receiptPDF !== '' && <p><a href={receiptPDF}>領収書を表示</a></p>}                 */}
                     <Button
                             variant="contained"
                             color="primary"

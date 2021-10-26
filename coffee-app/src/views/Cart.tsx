@@ -3,9 +3,6 @@ import type { VFC } from "react"
 import 'react-redux'
 import { StoreState, CartState, CartItemListState } from '../type/type'
 
-// firebase
-import firebase from "firebase/compat/app";
-import 'firebase/compat/firestore';
 // react
 import { DefaultRootState, useDispatch, useSelector } from "react-redux";
 import { useState, useEffect } from "react";
@@ -44,15 +41,15 @@ const Cart: VFC = () => {
     
     // ログインしている場合
     if(state.user && state.user.uid){
-      firebase.firestore()
-            .collection(`users/${state.user.uid}/carts`)
-            .doc(state.cart.uid)
-            .update(newCarts)
-            .then( querySnapshot => {                                              
-                dispatch({ type: 'UPDATE_CARTITEMLIST', payload: { cartItemList: newCartItemList }})              
-            })   
+      // firebase.firestore()
+      //       .collection(`users/${state.user.uid}/carts`)
+      //       .doc(state.cart.uid)
+      //       .update(newCarts)
+      //       .then( querySnapshot => {                                              
+      //           dispatch({ type: 'UPDATE_CARTITEMLIST', payload: { cartItemList: newCartItemList }})              
+      //       })   
     }else{
-      dispatch({ type: 'UPDATE_CARTITEMLIST', payload: { cartItemList: newCartItemList }})
+      // dispatch({ type: 'UPDATE_CARTITEMLIST', payload: { cartItemList: newCartItemList }})
     }
     
   }
@@ -65,20 +62,19 @@ const Cart: VFC = () => {
       localStorage.setItem('middle_login', String(true))
       localStorage.setItem('cart',JSON.stringify(state.cart))
       // login            
-      const google_auth_provider = new firebase.auth.GoogleAuthProvider();        
-      firebase.auth().signInWithRedirect(google_auth_provider)                                         
+                                          
     }
 
-  }
+  }  
 
   useEffect(()=>{
     let newCartItemList = state.cart.cartItemList
     if(newCartItemList){
       // cartのIDを全て商品情報に変換 Item, Topping, subtotal を追加
       newCartItemList = newCartItemList.map( c => { 
-        c.Item = GetItemById(c.Itemid, state.Coffee)
-        c.Topping = c.toppingid.map( t => GetItemById(t, state.Topping) )
-        c.subtotal = ( c.Item[c.price] + c.Topping.reduce((ac,cu) => ac + cu[c.price],0)) * Number(c.number)
+        c.Coffee = GetItemById(c.Itemid, state.Coffee)
+        c.Topping = c.topping_id.map( t => GetItemById(t, state.Topping) )
+        c.subtotal = ( c.Coffee[c.price] + c.Topping.reduce((ac,cu) => ac + cu[c.price],0)) * c.item_number
         return c
       })            
       setCartItemList(newCartItemList)
@@ -114,15 +110,15 @@ const Cart: VFC = () => {
             return (
             <TableRow key={index}>
               <TableCell component="th" scope="row">
-                <img src={`${process.env.PUBLIC_URL}/${c.Item.image}`} height="100px" alt="商品" style={{borderRadius:5}}/>
-                {c.Item.name}
+                <img src={`${window.location.origin}/${c.Coffee.image}`} height="100px" alt="商品" style={{borderRadius:5}}/>
+                {c.Coffee.coffee_name}
               </TableCell>
-              <TableCell>{c.price.replace('price','') + 'サイズ'}、{c.Item[c.price]}円、{c.number}個</TableCell>              
+              <TableCell>{c.price.replace('price','') + 'サイズ'}、{c.Coffee[c.price]}円、{c.item_number}個</TableCell>              
               <TableCell>
                 <ul>                     
                 {c.Topping.map((t,i) => {                  
                   return (
-                    <li key={i}>{t.name}、{t[c.price]}円</li>
+                    <li key={i}>{t.topping_name}、{t[c.price]}円</li>
                   )
                 })}
                 </ul> 
