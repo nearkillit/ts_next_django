@@ -64,7 +64,7 @@ const UserCheck = () => {
   }
 
   const logout = () => {
-    dispatch(userSlice.actions.UPDATE_USER({ id:'', email:''}))
+    dispatch(userSlice.actions.UPDATE_USER({}))
   }   
 
   const userStyle = {
@@ -98,6 +98,7 @@ const UserCheck = () => {
   useEffect(() => {     
     setUserEmail(state.user.email)
   },[state.user]) 
+  console.log(state.user)
 
   return (
     <>
@@ -112,8 +113,8 @@ const UserCheck = () => {
                 <Button onClick={logout} style={whiteMoji}><LockIcon />ログアウト</Button>                  
               </span>          
               :
-              <Link href="/component/Login/"><a><Button onClick={login} style={whiteMoji}><LockOpenIcon />ログイン</Button></a></Link>
-            }   
+              <Link href="/component/Login/"><a><Button style={whiteMoji}><LockOpenIcon />ログイン</Button></a></Link>
+      }
     </>                
   )
 }
@@ -129,7 +130,7 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
 
   return (
     <Provider store={store}>
-      <ThemeProvider theme={theme}>      
+      <ThemeProvider theme={theme}>
       <div className="App">        
         <AppBar>          
           <div className='App-header1'>

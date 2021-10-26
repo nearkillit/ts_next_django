@@ -45,7 +45,8 @@ export const userSlice = createSlice({
         ADD_CARTITEMLIST(state, action: PayloadAction<CartItemListState>){            
             state.cart.cartItemList.push(action.payload)            
         },
-        UPDATE_USER(state, action: PayloadAction<any>){            
+        UPDATE_USER(state, action: PayloadAction<any>){  
+            console.log(action.payload)          
             state.user = action.payload                        
         },
         ADD_ORDERHISTORY(state, action: PayloadAction<CartState>){

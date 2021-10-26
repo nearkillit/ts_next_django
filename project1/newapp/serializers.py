@@ -22,7 +22,7 @@ class CartsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Carts
         fields = ('id', 'user')
-        # extra_kwargs = {'user': {'read_only': True}}
+        extra_kwargs = {'user': {'read_only': True}}
 
 class OrderCoffeeSerializer(serializers.ModelSerializer):
     class Meta:

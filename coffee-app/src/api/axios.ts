@@ -81,8 +81,9 @@ export const loginByApi = async (data: loginState) => {
           password: data.password,
         })
         .then(res => {
-          console.log(res);          
-          axios.post('http://localhost:8000/api/cart/', res.data.user
+          console.log(res.data);
+          console.log(res.data.token);
+          axios.post('http://localhost:8000/api/cart/', res.data
           ,{ headers: {
               Authorization: `JWT ${res.data.token}`
             }}

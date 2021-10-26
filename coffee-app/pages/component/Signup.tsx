@@ -51,7 +51,8 @@ const Signup = () => {
       if(data.password1 !== data.password2){
         alert("入力されたパスワードが異なります")
       } else {
-        signUpByApi(data).then(res => {                 
+        signUpByApi(data).then(res => {
+          console.log(res);          
           dispatch(userSlice.actions.UPDATE_USER(res.data.user))
           handleLink('/')
         }).catch(err => {
@@ -107,7 +108,7 @@ const Signup = () => {
             className={classes.loginBtn}
             type="submit"
            >
-            SignUp
+            会員登録
           </Button>
         </CardActions>
       </Card>

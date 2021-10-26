@@ -1,8 +1,10 @@
-import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import  Link  from 'next/link'
 import { useRouter } from 'next/router'
 import axios from 'axios'
+import { useDispatch, useSelector } from "react-redux";
+// import { UPDATE_USER } from '../../src/store/slice/slice'
+import { userSlice } from '../../src/store/slice/slice';
 
 import { LoginState } from '../../src/type/type'
 import { loginByApi } from '../../src/api/axios'
@@ -15,6 +17,8 @@ import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
 import CardHeader from '@material-ui/core/CardHeader';
 import Button from '@material-ui/core/Button';
+import { useState } from 'react';
+
 
 type submit = {
     email: string;
@@ -45,21 +49,25 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
+// declare module 'react-redux' {
+//   interface DefaultRootState extends StoreState {}
+// }
+
+
 const Login = () => {
   const classes = useStyles();
-
   const router = useRouter()
+  const dispatch = useDispatch()
 
   const {register,handleSubmit} = useForm()
   const onSubmit = (data: submit) => {
     loginByApi(data)
-    .catch(res => {
+    .then(res => {
       console.log(res);      
-    }).then(err => {
+    }).catch(err => {
       console.log(err);      
     })
   }
-
 
   return (
     <>
@@ -67,7 +75,7 @@ const Login = () => {
     <div>会員登録は <Link href="/component/Signup/"><a>こちらから</a></Link></div>
     <form className={classes.container} onSubmit={handleSubmit(onSubmit)}>
       <Card className={classes.card}>
-        <CardHeader className={classes.header} title="Login" />
+        <CardHeader className={classes.header} title="ログイン" />
         <CardContent>
           <div>
             <TextField
@@ -99,7 +107,7 @@ const Login = () => {
             className={classes.loginBtn}
             type="submit"
            >
-            Login
+            ログイン
           </Button>
         </CardActions>
       </Card>

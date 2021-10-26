@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'rest_auth.registration',
-    'corsheaders',              # CORS設定
+    'corsheaders',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -56,7 +56,8 @@ INSTALLED_APPS = [
 AUTH_USER_MODEL = 'newapp.User'
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware', # new topに置く　CORS設定    
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -64,6 +65,11 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:3000',
+    'http://localhost:3001'
 ]
 
 ROOT_URLCONF = 'project1.urls'

@@ -9,6 +9,7 @@ from .models import User, Coffee, Topping, Carts, OrderCoffee, Orderers, OrderTo
 class UserVieSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = serializers.UserSerializer
+    permission_classes = (AllowAny,)
 
 class CoffeeVieSet(viewsets.ModelViewSet):
     queryset = Coffee.objects.all()
