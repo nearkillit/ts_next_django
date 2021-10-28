@@ -50,6 +50,11 @@ class OrderCoffeeVieSet(viewsets.ModelViewSet):
         carts_id_list = [ json.loads(c)['id'] for c in carts_list ]                
         # carts__inで検索             
         return self.queryset.filter(carts__in=carts_id_list)
+    
+    def destroy(self, request, *args, **kwargs):                           
+        instance = self.queryset.filter(id=self.request.data["id"])
+        instance.delete()
+        return Response(status=http_status.HTTP_204_NO_CONTENT)
 
 class OrderersVieSet(viewsets.ModelViewSet):
     queryset = Orderers.objects.all()

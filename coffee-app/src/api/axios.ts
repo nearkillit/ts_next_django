@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { SignUpState } from '../type/type'
+import { SignUpState, CartState } from '../type/type'
 
 // export const getItemByApi = async () => {
 //     let getData = { Coffee:[], Topping:[]}
@@ -67,14 +67,19 @@ type cartDelCar = {
 
 export const cartUpdateByApi = async (data: cartUpdApi) => {
     return await new Promise( async (resolve, reject) => {        
-        try{            
+        try{                             
           const res = await axios.post('http://localhost:8000/api/ordercoffee/', data.cart
                         ,{headers: {
                             Authorization: `JWT ${data.token}`
                         }}
                     )
-        
-          const res1 = await axios.post('http://localhost:8000/api/ordertoppings/', data.topping
+          
+          const newTop = data.topping.map(t => { 
+                            t.cart = res.data.id
+                            return t
+                        })         
+                        
+          const res1 = await axios.post('http://localhost:8000/api/ordertoppings/', newTop
                         ,{headers: {
                             Authorization: `JWT ${data.token}`
                         }}
@@ -90,12 +95,12 @@ export const cartUpdateByApi = async (data: cartUpdApi) => {
 export const cartDeleteByApi = async (data: cartDelApi) => {
     return await new Promise( async (resolve, reject) => {        
         try{            
-          await axios.delete('http://localhost:8000/api/ordercoffee/3fa55a0c-026e-4a41-b38f-715fa4c66120/'
-                        ,{
-                            // params: { id: "3fa55a0c-026e-4a41-b38f-715fa4c66120" },
+          await axios.delete('http://localhost:8000/api/ordercoffee/' + data.cart.id + '/'
+                         ,{
+                            data: { id :data.cart.id },
                             headers: {
-                              Authorization: `JWT ${data.token}`
-                        }}
+                              Authorization: `JWT ${data.token}`}
+                        }
                     )
 
           resolve("ok delete")
@@ -147,7 +152,7 @@ export const loginByApi = async (data: loginState) => {
             headers: {
               Authorization: `JWT ${res.data.token}`
             }
-        })
+        })        
         
         if(res1.data.length === 0){
             const res2 = await axios.post('http://127.0.0.1:8000/api/cart/', res.data,{
@@ -183,6 +188,40 @@ export const loginByApi = async (data: loginState) => {
       } catch (err){
         reject(err)
       } 
+    })
+}
+
+export type addOrderState = {
+    order: CartState,
+    user: addOrderUserState
+    token: string,
+}
+
+type addOrderUserState = {
+    email: string,
+    id: string
+}
+
+// あとカートの追加をする
+export const addOrderByApi = async (data: addOrderState) => { 
+    return await new Promise( async (resolve, reject) => {
+      try{
+        const res = await axios.post('http://127.0.0.1:8000/api/orderers/', data.order, {
+            headers: {
+                Authorization: `JWT ${data.token}`
+            }})
+        
+        // loginと同じ処理をする　↓
+        const res2 = await axios.post('http://127.0.0.1:8000/api/cart/', data.user, {
+            headers: {
+                Authorization: `JWT ${data.token}`
+            }
+        })
+
+        resolve({ order: res, cart: res2 })
+      }catch(err){
+        reject(err)
+      }
     })
 }
 

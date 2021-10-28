@@ -38,16 +38,17 @@ const Cart: VFC = () => {
 
   const deleteCart = (index) => {
     const newCartItemList = cartItemList.filter((c,i) => i !== index)    
-    
+    const delCartItemList = cartItemList.filter((c,i) => i === index)[0]
+
     // ログインしている場合
     if(state.user.id){
       dispatch(userSlice.actions.UPDATE_CARTITEMLIST(newCartItemList))
-      cartDeleteByApi({ cart:{ id: '' }, token: state.user.token })
+      cartDeleteByApi({ cart:{ id: delCartItemList.id }, token: state.user.token })
       .then(res => console.log(res))
       .catch(err => console.log(err))
     }else{
       dispatch(userSlice.actions.UPDATE_CARTITEMLIST(newCartItemList))
-      cartDeleteByApi({ cart:{ id: '' }, token: state.user.token })
+      cartDeleteByApi({ cart:{ id: delCartItemList.id }, token: state.user.token })
       .then(res => console.log(res))
       .catch(err => console.log(err))
     }
@@ -59,10 +60,7 @@ const Cart: VFC = () => {
     // ログインしている場合
     if(state.user){
       handleLink('/component/OrderConfirm')
-    }else{
-      // localStorage.setItem('middle_login', String(true))
-      // localStorage.setItem('cart',JSON.stringify(state.cart))
-      // login            
+    }else{              
       handleLink('/component/OrderConfirm')                       
     }
 

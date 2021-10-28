@@ -64,12 +64,11 @@ const Login = () => {
   const {register,handleSubmit} = useForm()
   const onSubmit = (data: submit) => {
     loginByApi(data)
-    .then((res: any) => {      
-      console.log(res)
+    .then((res: any) => {            
 
       const orderId = res.order.map(o => o.carts)
-      let cartData = res.cart.filter(c => orderId.includes(c.id))
-      let orderData = res.cart.filter(c => !orderId.includes(c.id))
+      let cartDataOrigin = res.cart.filter(c => !orderId.includes(c.id))
+      let orderDataOrigin = res.cart.filter(c => orderId.includes(c.id))
       
       // cart,toppingの情報を変換
       let orderCart = res.ordercart.map(oc => {
@@ -81,17 +80,21 @@ const Login = () => {
                         oc.Topping.reduce((pre,cur)=> pre+cur["topping_" + oc.item_size],0))
                         * oc.item_number
         return oc
-      })
+      })      
 
-      cartData = cartData.map(c => 
+      // ordercart を注文履歴とカートに仕分けている
+      let cartData = cartDataOrigin.map(c => 
         orderCart.filter(oc => oc.carts === c.id)
       )[0]
 
-      orderData = orderData.map(o => {
+      let orderData = orderDataOrigin.map(o => {
         o.cartItemList = orderCart.filter(oc => oc.carts === o.id)
         return o
       })            
-
+      
+      console.log(cartDataOrigin);
+      
+      dispatch(userSlice.actions.FETCH_CART_ID(cartDataOrigin[0].id))
       dispatch(userSlice.actions.UPDATE_USER(res.user))
       dispatch(userSlice.actions.FETCH_ORDERHISTORY(orderData))
       dispatch(userSlice.actions.UPDATE_CARTITEMLIST(cartData))

@@ -90,7 +90,8 @@ const ItemDetail: VFC = () =>{
                                 subtotal: totalPrice(),
                                 topping_id: choiceTopping, 
                                 Coffee: selectCoffee,
-                                Topping: GetToppingsById(choiceTopping, state.Topping)
+                                Topping: GetToppingsById(choiceTopping, state.Topping),
+                                id: ''
                               }     
             
             // ログインしていた場合はFirebase、storeを更新            
@@ -101,13 +102,13 @@ const ItemDetail: VFC = () =>{
                                 }
                 const updCartTopping = allSelects.topping_id.map(t =>
                                         { return { topping_id: t,
-                                                   cart: "3fa55a0c-026e-4a41-b38f-715fa4c66120" 
+                                                   cart: "" 
                                         }} )
                 cartUpdateByApi({ cart: updCart, 
                                   topping: updCartTopping, 
                                   token: state.user.token})
-                .then(res => {
-                    console.log(res);                    
+                .then((res: any) => {
+                    allSelects.id = res.cart.data.id           
                     dispatch(userSlice.actions.ADD_CARTITEMLIST(allSelects))    
                 })            
             handleLink('/component/Cart')

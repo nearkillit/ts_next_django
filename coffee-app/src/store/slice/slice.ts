@@ -54,12 +54,20 @@ export const userSlice = createSlice({
         FETCH_CART(state, action: PayloadAction<CartState>){
             state.cart = action.payload            
         },
+        FETCH_CART_ID(state, action: PayloadAction<string>){
+            state.cart.id = action.payload            
+        },
         FETCH_ORDERHISTORY(state, action: PayloadAction<OrderhistoryState>){
             state.orderhistory = action.payload            
         },
         FETCH_ITEM(state, action: PayloadAction<any>){                       
             if(action.payload.Coffee) state.Coffee = action.payload.Coffee 
             if(action.payload.Topping) state.Topping = action.payload.Topping
+        },
+        LOGOUT(state){
+            state.user = {}
+            state.cart = newCart
+            state.orderhistory = []
         }
     },
   })

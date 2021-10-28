@@ -65,6 +65,7 @@ const UserCheck = () => {
 
   const logout = () => {
     dispatch(userSlice.actions.UPDATE_USER({}))
+    dispatch(userSlice.actions.LOGOUT())
   }   
 
   const userStyle = {

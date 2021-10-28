@@ -9,6 +9,7 @@ import Router from 'next/router'
 // component
 import { StoreState, ToppingState, CartItemListState } from '../../src/type/type'
 import { userSlice } from '../../src/store/slice/slice';
+import { addOrderByApi } from '../../src/api/axios'
 
 // components
 // import { newCart } from '../store/index'
@@ -87,30 +88,22 @@ const OrderConfirm: VFC = () => {
   const AddCartFire = (by) => {
 
     // by = 購入者情報
-    const newOrder = Object.assign(by,{ cartItemList: state.cart.cartItemList } )   
-
-    dispatch(userSlice.actions.NEW_CART())
-    dispatch(userSlice.actions.ADD_ORDERHISTORY(newOrder))
-    // // add history
-    // firebase.firestore()
-    //         .collection(`users/${state.user.uid}/carts`)
-    //         .doc(state.cart.uid)
-    //         .update(newOrder)
-    //         .then( d => {
-    //           dispatch({ type:'ADD_ORDERHISTORY', payload:{ uid: state.cart.uid, orderhistory: newOrder }})
-    //         })
-
-    // // create cate
-    // firebase.firestore()
-    //           .collection(`users/${state.user.uid}/carts`)
-    //           .add(newCart)
-    //           .then( d => {
-    //             const newCarts = Object.assign({}, newCart)
-    //             newCarts.uid = d.id
-    //             newCarts.cartItemList = []
-    //             dispatch({ type:'CREATE_CART', payload:{ cart: newCarts }})
-    //           })
-    handleLink('/component/OrderFinish')
+    const newOrder = Object.assign({ cartItemList: state.cart.cartItemList,
+                                     carts: state.cart.id,
+                                     user: state.user.user_id
+                                    } ,by)     
+    
+    // data = newOrder の形を変える
+    addOrderByApi({ order:newOrder, token:state.user.token, user:state.user })
+    .then((res: any) => {
+      console.log(res)
+      dispatch(userSlice.actions.NEW_CART())
+      dispatch(userSlice.actions.FETCH_CART_ID(res.cart.data.id))
+      dispatch(userSlice.actions.ADD_ORDERHISTORY(newOrder))
+      handleLink('/component/OrderFinish')
+    })
+    .catch(err => 
+      console.log(err))    
   }
 
   const changeName = (e) => {
@@ -263,9 +256,9 @@ const validOrderdate=(orderDate)=>{
     setErrors(allError)
 
     if (allError.length === 0) {
-        let objName = {name:name}
+        let objName = {order_name:name}
         let objEmail = {email:email}
-        let objAddnumber = {addressNumber:addNumber}
+        let objAddnumber = {addressnumber:addNumber}
         let objAddress = {address:address}
         let objOrderDate = {order_date:orderDate}
         let objOrderTime = {order_time:orderTime}
@@ -291,7 +284,7 @@ const validOrderdate=(orderDate)=>{
       // subtotal を追加
       newCartItemList = newCartItemList.map( c => {
         let cc = Object.assign({},c)
-        cc.subtotal = ( c.Coffee["coffee_" + c.price] + c.Topping.reduce((ac,cu) => ac + cu["topping_" + c.price],0)) * c.item_number
+        cc.subtotal = ( c.Coffee["coffee_" + c.item_size] + c.Topping.reduce((ac,cu) => ac + cu["topping_" + c.item_size],0)) * c.item_number
         return cc
       })            
       setCartItemList(newCartItemList)
@@ -339,12 +332,12 @@ const validOrderdate=(orderDate)=>{
                 <img src={c.Coffee.img} height="100px" alt="商品" style={{borderRadius:5}}/>
                 <span>{c.Coffee.coffee_name}</span>  
               </TableCell>
-              <TableCell>{c.price.replace('price','') + 'サイズ'}、{c.Coffee["coffee_" + c.price]}円、{c.item_number}個</TableCell>
+              <TableCell>{c.item_size.replace('price','') + 'サイズ'}、{c.Coffee["coffee_" + c.item_size]}円、{c.item_number}個</TableCell>
               <TableCell>
                 <ul>
                 {c.Topping.map((t,i) => {
                   return (
-                    <li key={i}>{t.topping_name}、{t["topping_" + c.price]}円</li>
+                    <li key={i}>{t.topping_name}、{t["topping_" + c.item_size]}円</li>
                   )
                 })}
                 </ul>

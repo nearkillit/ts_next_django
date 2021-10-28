@@ -179,3 +179,4 @@ CORS_ORIGIN_WHITELIST = [
     'http://127.0.0.1:3001',
     'http://localhost:8000',    
 ]
+

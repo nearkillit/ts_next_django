@@ -29,6 +29,7 @@ export type CartItemListState = {
     item_number: number,
     item_size: string,
     subtotal: number,
+    id?: string,
     topping_id?: Array<string>,
     Coffee?: CoffeeState,
     Topping?: Array<ToppingState>
