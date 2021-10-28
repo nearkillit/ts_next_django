@@ -2,6 +2,11 @@
   "/_app": "pages/_app.js",
   "/_document": "pages/_document.js",
   "/_error": "pages/_error.js",
+<<<<<<< HEAD
   "/component/Login": "pages/component/Login.js",
   "/component/Cart": "pages/component/Cart.js"
+=======
+  "/": "pages/index.js",
+  "/component/Login": "pages/component/Login.js"
+>>>>>>> 4461294c3def8453fc03345684ad1f8d38b4163d
 }
