@@ -54,12 +54,12 @@ const OrderHistory: VFC = () => {
                   <img src={c.Coffee.img} height="100px" alt="商品" style={{borderRadius:5}}/>
                   {c.Coffee.coffee_name}
                 </TableCell>
-                <TableCell>{c.price.replace('price','') + 'サイズ'}、{c.Coffee["coffee_" + c.price]}円、{c.item_number}個</TableCell>              
+                <TableCell>{c.item_size.replace('price','') + 'サイズ'}、{c.Coffee["coffee_" + c.item_size]}円、{c.item_number}個</TableCell>              
                 <TableCell>
                   <ul>                     
                   {c.Topping.map((t,i) => {                  
                     return (
-                      <li key={i}>{t.topping_name}、{t["topping_" + c.price]}円</li>
+                      <li key={i}>{t.topping_name}、{t["topping_" + c.item_size]}円</li>
                     )
                   })}
                   </ul> 

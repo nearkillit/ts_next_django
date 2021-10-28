@@ -5,11 +5,12 @@ import  Link  from 'next/link'
 import { useRouter } from 'next/router'
 import axios from 'axios'
 
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+
 import { SignUpState } from '../../src/type/type'
 import { signUpByApi } from '../../src/api/axios'
 import { userSlice } from '../../src/store/slice/slice';
 
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
@@ -51,9 +52,10 @@ const Signup = () => {
       if(data.password1 !== data.password2){
         alert("入力されたパスワードが異なります")
       } else {
-        signUpByApi(data).then(res => {
-          console.log(res);          
-          dispatch(userSlice.actions.UPDATE_USER(res.data.user))
+        signUpByApi(data).then((res: any) => {
+          console.log(res);                    
+          dispatch(userSlice.actions.UPDATE_USER(res.user))
+          dispatch(userSlice.actions.FETCH_CART(res.cart))
           handleLink('/')
         }).catch(err => {
           console.log(err);

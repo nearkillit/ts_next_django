@@ -26,8 +26,8 @@ declare module 'react-redux' {
 }
 
 const ItemDetail: VFC = () =>{
-    const router = useRouter();
-    let Item_id = router.query.id
+    const Router = useRouter();
+    let Item_id = Router.query.id
     const state = useSelector((state: DefaultRootState ) => state.user)
     const dispatch = useDispatch()
     const handleLink = path => Router.push(path)
@@ -86,37 +86,31 @@ const ItemDetail: VFC = () =>{
 
             let allSelects = {  Itemid: selectCoffee.id, 
                                 item_number: Number(quantityChoise),
-                                price : sizePrice,
+                                item_size : sizePrice,
                                 subtotal: totalPrice(),
                                 topping_id: choiceTopping, 
                                 Coffee: selectCoffee,
                                 Topping: GetToppingsById(choiceTopping, state.Topping)
                               }     
             
-            // ログインしていた場合はFirebase、storeを更新
-            if(state.user.email){
-                cartUpdateByApi({ item_number: allSelects.item_number, 
+            // ログインしていた場合はFirebase、storeを更新            
+                const updCart = { item_number: allSelects.item_number, 
                                   coffee_id: allSelects.Itemid,
-                                  item_size: allSelects.price,
-                                  carts: state.user.id
-                                })
+                                  item_size: allSelects.item_size,
+                                  carts: state.cart.id
+                                }
+                const updCartTopping = allSelects.topping_id.map(t =>
+                                        { return { topping_id: t,
+                                                   cart: "3fa55a0c-026e-4a41-b38f-715fa4c66120" 
+                                        }} )
+                cartUpdateByApi({ cart: updCart, 
+                                  topping: updCartTopping, 
+                                  token: state.user.token})
                 .then(res => {
                     console.log(res);                    
                     dispatch(userSlice.actions.ADD_CARTITEMLIST(allSelects))    
-                })                
-            // ログインしていない場合はstore飲み更新
-            }else{
-                cartUpdateByApi({ item_number: allSelects.item_number, 
-                    coffee_id: allSelects.Itemid,
-                    item_size: allSelects.price,
-                    carts: state.user.id
-                  })
-                .then(res => {
-                    console.log(res);                    
-                    dispatch(userSlice.actions.ADD_CARTITEMLIST(allSelects))    
-                })
-            }  
-            // handleLink('/component/Cart')
+                })            
+            handleLink('/component/Cart')
         }                
     }
     

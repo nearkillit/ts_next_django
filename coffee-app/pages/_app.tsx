@@ -10,7 +10,7 @@ import { useRouter } from 'next/router'
 import store from '../src/store/createStore';
 import { userSlice } from '../src/store/slice/slice';
 import { StoreState } from '../src/type/type'
-import { cartFetchByApi } from '../src/api/axios'
+// import { cartFetchByApi } from '../src/api/axios'
 
 // material ui
 import theme from './theme'
@@ -86,24 +86,14 @@ const UserCheck = () => {
     console.log(state);    
   }
 
-  const cartTest = async () => {
-    cartFetchByApi({ id:'f1edc096-8e6d-44a8-8098-c91a021112cc' })
-    .then(res => {
-      console.log(res)      
-    }).catch(err => {
-      console.log(err)
-    })      
-  }
-
   useEffect(() => {     
     setUserEmail(state.user.email)
   },[state.user]) 
-  console.log(state.user)
+  // console.log(state.user)
 
   return (
     <>
-      <Button onClick={statecheck} >State</Button>
-      <Button onClick={cartTest} >test</Button>
+      <Button onClick={statecheck} >State</Button>      
      { state.user.email ? 
               <span>          
                 <span style={userStyle}>

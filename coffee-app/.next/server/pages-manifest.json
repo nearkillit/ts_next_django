@@ -2,6 +2,6 @@
   "/_app": "pages/_app.js",
   "/_document": "pages/_document.js",
   "/_error": "pages/_error.js",
-  "/": "pages/index.js",
-  "/component/ItemDetail/[id]": "pages/component/ItemDetail/[id].js"
+  "/component/Login": "pages/component/Login.js",
+  "/component/Cart": "pages/component/Cart.js"
 }

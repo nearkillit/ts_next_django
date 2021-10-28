@@ -18,7 +18,7 @@ export const newCart: CartState = {
     order_date:'',
     order_time:'',
     status:0,
-    tel:'',    
+    tel:'', 
   }  
 
 export const initialState: userState = {
@@ -45,8 +45,7 @@ export const userSlice = createSlice({
         ADD_CARTITEMLIST(state, action: PayloadAction<CartItemListState>){            
             state.cart.cartItemList.push(action.payload)            
         },
-        UPDATE_USER(state, action: PayloadAction<any>){  
-            console.log(action.payload)          
+        UPDATE_USER(state, action: PayloadAction<any>){                      
             state.user = action.payload                        
         },
         ADD_ORDERHISTORY(state, action: PayloadAction<CartState>){
@@ -54,6 +53,9 @@ export const userSlice = createSlice({
         },
         FETCH_CART(state, action: PayloadAction<CartState>){
             state.cart = action.payload            
+        },
+        FETCH_ORDERHISTORY(state, action: PayloadAction<OrderhistoryState>){
+            state.orderhistory = action.payload            
         },
         FETCH_ITEM(state, action: PayloadAction<any>){                       
             if(action.payload.Coffee) state.Coffee = action.payload.Coffee 

@@ -41,4 +41,7 @@ class OrderToppingSerializer(serializers.ModelSerializer):
         model = OrderTopping
         fields = ('id', 'cart', 'topping_id')
 
+class OrderToppingListSerializer(serializers.ListSerializer):
+    child = OrderToppingSerializer()
+
 

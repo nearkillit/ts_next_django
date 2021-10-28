@@ -123,9 +123,9 @@ class Carts(models.Model):
 class OrderCoffee(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)    
     item_number = models.IntegerField('数量', blank=False, null=False)
-    coffee_id = models.OneToOneField(Coffee, on_delete=models.CASCADE)
+    coffee_id = models.ForeignKey(Coffee, on_delete=models.CASCADE)  # 修正
     item_size = models.CharField('商品サイズ', max_length=6, blank=False, null=False)
-    carts = models.ForeignKey(Carts, on_delete=models.CASCADE)
+    carts = models.ForeignKey(Carts, on_delete=models.CASCADE, related_name='carts')
 
 
 class Orderers(models.Model):
@@ -139,12 +139,12 @@ class Orderers(models.Model):
     order_time = models.IntegerField('配達時間', blank=False, null=False)
     tel = models.CharField('電話番号', max_length=14, blank=False) #　型付けする
     status = models.IntegerField('注文状況', blank=False, null=False)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE) 
 
 
 class OrderTopping(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     cart = models.ForeignKey(OrderCoffee, on_delete=models.CASCADE)
-    topping_id = models.OneToOneField(Topping, on_delete=models.CASCADE) # parent_link=False
+    topping_id = models.ForeignKey(Topping, on_delete=models.CASCADE) # parent_link=False
 
     

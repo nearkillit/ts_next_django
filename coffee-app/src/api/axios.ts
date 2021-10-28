@@ -20,52 +20,89 @@ export const getItemByApi = async () => {
 
 export const signUpByApi = async (data: SignUpState) => {    
 
-    return await new Promise((resolve, reject) => {
-      axios.post('http://localhost:8000/api/rest-auth/registration/', data)
-        .then(res => {
-          alert('新規登録が完了しました。ログイン画面よりログインしてください。')          
-          resolve(res)
-      })
-      .catch(err => {
-          alert('パスワードは8文字以上必要です。')
-          reject(err)          
-        })
-      })      
+    return await new Promise(async (resolve, reject) => {
+      try{
+        const res = await axios.post('http://localhost:8000/api/rest-auth/registration/', data)
+        const res2 = await axios.post('http://127.0.0.1:8000/api/cart/', res.data,{
+                        headers: {
+                          Authorization: `JWT ${res.data.token}`
+                        }
+                    })
+        alert('新規登録が完了しました。ログイン画面よりログインしてください。')          
+        resolve({ user:{ id: res.data.user.id, email:res.data.user.email, token: res.data.token}
+            , cart:res2.data })
+      }catch(err){
+        alert('パスワードは8文字以上必要です。')
+        reject(err)
+      }
+    })    
 }
 
-export type cartUpdateApi = {
+export type cartUpdApi = {    
+    cart: cartUpdCar,
+    token: string,
+    topping: Array<cartUpdTop>
+}
+
+type cartUpdTop = {
+    topping_id: string,
+    cart: string
+}
+
+type cartUpdCar = {    
     item_number: number,
     coffee_id: string,
     item_size: string,   
     carts: string 
 }
 
-export const cartUpdateByApi = async (data: cartUpdateApi) => {
-    return await new Promise((resolve, reject) => {
-        axios.post('http://localhost:8000/api/ordercoffee/', data)
-          .then(res => {
-            resolve(res)
-        })
-        .catch(err => {            
-            reject(err)          
-          })
-        })  
+export type cartDelApi = {    
+    cart: cartDelCar,
+    token: string,    
 }
 
-export type cartFetchApi = {
-    id: string
+type cartDelCar = {
+    id: string,    
 }
 
-export const cartFetchByApi = async (data: cartFetchApi) => {
-    return await new Promise((resolve, reject) => {
-        axios.post('http://localhost:8000/api/cart/', { id: '41e1749d-8333-4eb5-a8e7-90e4fd628135'})
-          .then(res => {
-            resolve(res)
-        })
-        .catch(err => {            
-            reject(err)          
-          })
-        })  
+export const cartUpdateByApi = async (data: cartUpdApi) => {
+    return await new Promise( async (resolve, reject) => {        
+        try{            
+          const res = await axios.post('http://localhost:8000/api/ordercoffee/', data.cart
+                        ,{headers: {
+                            Authorization: `JWT ${data.token}`
+                        }}
+                    )
+        
+          const res1 = await axios.post('http://localhost:8000/api/ordertoppings/', data.topping
+                        ,{headers: {
+                            Authorization: `JWT ${data.token}`
+                        }}
+                    )
+
+          resolve({cart: res, topping: res1 })
+        }catch(err){            
+          reject(err)
+        }
+    })  
+}
+
+export const cartDeleteByApi = async (data: cartDelApi) => {
+    return await new Promise( async (resolve, reject) => {        
+        try{            
+          await axios.delete('http://localhost:8000/api/ordercoffee/3fa55a0c-026e-4a41-b38f-715fa4c66120/'
+                        ,{
+                            // params: { id: "3fa55a0c-026e-4a41-b38f-715fa4c66120" },
+                            headers: {
+                              Authorization: `JWT ${data.token}`
+                        }}
+                    )
+
+          resolve("ok delete")
+        }catch(err){            
+          reject(err)
+        }
+    })  
 }
 
 export type loginState = {
@@ -73,30 +110,92 @@ export type loginState = {
     password: string
 }
 
+export type loginUserState = {
+    user: loginUserDataState,
+    cart: Array<any>,
+    order: Array<any>,
+    ordercart: Array<any>,
+    ordertopping: Array<any>,
+}
+
+export type loginUserDataState = {
+    user_id: string,
+    email: string,
+    token: string,     
+}
+
 export const loginByApi = async (data: loginState) => { 
+    let userData: loginUserState = {
+        user: { user_id: '', email: '', token: '' },
+        cart: [],
+        order: [],
+        ordercart: [],
+        ordertopping: []
+    }
     
-    return await new Promise((resolve, reject) => { 
-        axios.post('http://localhost:8000/api/rest-auth/login/',{
+
+    return await new Promise( async (resolve, reject) => {
+      try {
+        const res = await axios.post('http://localhost:8000/api/rest-auth/login/',{
           email: data.email,
           password: data.password,
-        })
-        .then(res => {
-          console.log(res.data);
-          console.log(res.data.token);
-          axios.post('http://localhost:8000/api/cart/', res.data
-          ,{ headers: {
+        })        
+        userData.user.user_id = res.data.user.id
+        userData.user.email = res.data.user.email
+        userData.user.token = res.data.token
+        const res1 = await axios.get('http://127.0.0.1:8000/api/cart/',{
+            headers: {
               Authorization: `JWT ${res.data.token}`
-            }}
-            ).then( _res => {
-              resolve(_res.data)
+            }
+        })
+        
+        if(res1.data.length === 0){
+            const res2 = await axios.post('http://127.0.0.1:8000/api/cart/', res.data,{
+                headers: {
+                  Authorization: `JWT ${res.data.token}`
+                }
             })
-            .catch( _err => {
-              reject(_err)
+            userData.cart[0] = { id: res2.data.id }
+        }else{
+            // cart を持ってくる処理
+            userData.cart = res1.data                
+                
+            // orderers　を持ってくる
+            const _res = await axios.get('http://127.0.0.1:8000/api/orderers/',{
+                headers: {
+                  Authorization: `JWT ${res.data.token}`
+                }
             })
-        }) 
-        .catch(err => {
-          alert("入力されたEmailもしくはパスワードが異なります")
-          reject(err)
+            userData.order = _res.data
+            // ordercart を持ってくる処理
+            const __res = await axios.get('http://127.0.0.1:8000/api/ordercoffee/',{
+                params: res1.data
+            })
+            userData.ordercart = __res.data            
+
+            const ___res = await axios.get('http://127.0.0.1:8000/api/ordertopping/',{
+                params: __res.data
+            })
+            userData.ordertopping = ___res.data
+            
+        }                             
+        resolve(userData)
+      } catch (err){
+        reject(err)
+      } 
+    })
+}
+
+export const getOrdersByApi = async (token: string) => { 
+    return await new Promise((resolve, reject) => { 
+        axios.get('http://127.0.0.1:8000/api/orderers/',{
+            headers: {
+                Authorization: `JWT ${token}`
+            }
+        }).then(_res => {
+            resolve(_res)
+        }).catch(_err => {
+            reject(_err)
         })
     })
 }

@@ -2,12 +2,12 @@ import { useForm } from 'react-hook-form'
 import  Link  from 'next/link'
 import { useRouter } from 'next/router'
 import axios from 'axios'
-import { useDispatch, useSelector } from "react-redux";
-// import { UPDATE_USER } from '../../src/store/slice/slice'
-import { userSlice } from '../../src/store/slice/slice';
+import { DefaultRootState, useSelector, useDispatch } from 'react-redux';
 
-import { LoginState } from '../../src/type/type'
-import { loginByApi } from '../../src/api/axios'
+import { userSlice } from '../../src/store/slice/slice';
+import { StoreState, LoginState } from '../../src/type/type'
+import { loginByApi, loginUserState } from '../../src/api/axios'
+import { GetCoffeeById, GetToppingsById } from '../../src/components/Items'
 
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 
@@ -49,24 +49,56 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-// declare module 'react-redux' {
-//   interface DefaultRootState extends StoreState {}
-// }
+declare module 'react-redux' {
+  interface DefaultRootState extends StoreState {}
+}
 
 
 const Login = () => {
   const classes = useStyles();
-  const router = useRouter()
+  const Router = useRouter()
+  const handleLink = path => Router.push(path)
   const dispatch = useDispatch()
+  const state = useSelector((state: DefaultRootState ) => state.user)
 
   const {register,handleSubmit} = useForm()
   const onSubmit = (data: submit) => {
     loginByApi(data)
-    .then(res => {
-      console.log(res);      
+    .then((res: any) => {      
+      console.log(res)
+
+      const orderId = res.order.map(o => o.carts)
+      let cartData = res.cart.filter(c => orderId.includes(c.id))
+      let orderData = res.cart.filter(c => !orderId.includes(c.id))
+      
+      // cart,toppingの情報を変換
+      let orderCart = res.ordercart.map(oc => {
+        oc.topping_id = res.ordertopping.filter(ot => ot.cart === oc.id)
+        oc.topping_id = oc.topping_id.map(ot => ot.topping_id)
+        oc.Topping = GetToppingsById(oc.topping_id, state.Topping)
+        oc.Coffee = GetCoffeeById(oc.coffee_id, state.Coffee)
+        oc.subtotal = (oc.Coffee["coffee_" + oc.item_size] + 
+                        oc.Topping.reduce((pre,cur)=> pre+cur["topping_" + oc.item_size],0))
+                        * oc.item_number
+        return oc
+      })
+
+      cartData = cartData.map(c => 
+        orderCart.filter(oc => oc.carts === c.id)
+      )[0]
+
+      orderData = orderData.map(o => {
+        o.cartItemList = orderCart.filter(oc => oc.carts === o.id)
+        return o
+      })            
+
+      dispatch(userSlice.actions.UPDATE_USER(res.user))
+      dispatch(userSlice.actions.FETCH_ORDERHISTORY(orderData))
+      dispatch(userSlice.actions.UPDATE_CARTITEMLIST(cartData))
+      handleLink('/')
     }).catch(err => {
       console.log(err);      
-    })
+    })                    
   }
 
   return (

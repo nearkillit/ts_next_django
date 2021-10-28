@@ -3,6 +3,10 @@ from rest_framework import viewsets
 from . import serializers
 from rest_framework.permissions import AllowAny
 from .models import User, Coffee, Topping, Carts, OrderCoffee, Orderers, OrderTopping
+import json
+from rest_framework.response import Response
+from rest_framework import status as http_status
+from .permissions import IsMyselfToRetrieveUpdateDestroy 
 
 # Create your views here.
 
@@ -25,7 +29,7 @@ class ToppingVieSet(viewsets.ModelViewSet):
 
 class CartVieSet(viewsets.ModelViewSet):
     queryset =  Carts.objects.all()
-    serializer_class = serializers.CartsSerializer
+    serializer_class = serializers.CartsSerializer    
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
     
@@ -35,8 +39,17 @@ class CartVieSet(viewsets.ModelViewSet):
 
 
 class OrderCoffeeVieSet(viewsets.ModelViewSet):
-    queryset = OrderCoffee.objects.all()
+    queryset = OrderCoffee.objects.all()    
     serializer_class = serializers.OrderCoffeeSerializer
+    permission_classes = (AllowAny,)
+
+    def get_queryset(self):
+        # JSONの配列をpythonの配列へ        
+        carts_list = list(self.request.GET.values())
+        # 一つ一つJSONから辞書型に変換   
+        carts_id_list = [ json.loads(c)['id'] for c in carts_list ]                
+        # carts__inで検索             
+        return self.queryset.filter(carts__in=carts_id_list)
 
 class OrderersVieSet(viewsets.ModelViewSet):
     queryset = Orderers.objects.all()
@@ -47,6 +60,19 @@ class OrderersVieSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return self.queryset.filter(user=self.request.user.id)
 
+
 class OrderToppingVieSet(viewsets.ModelViewSet):
     queryset = OrderTopping.objects.all()
     serializer_class = serializers.OrderToppingSerializer
+
+    def get_queryset(self):
+        # JSONの配列をpythonの配列へ        
+        carts_list = list(self.request.GET.values())
+        # 一つ一つJSONから辞書型に変換   
+        carts_id_list = [ json.loads(c)['id'] for c in carts_list ]                
+        # carts__inで検索             
+        return self.queryset.filter(cart__in=carts_id_list)
+
+class OrderToppingListViewSet(viewsets.ModelViewSet):
+    queryset = OrderTopping.objects.all()
+    serializer_class = serializers.OrderToppingListSerializer    

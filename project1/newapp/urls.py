@@ -12,6 +12,7 @@ router.register('cart', views.CartVieSet)
 router.register('ordercoffee', views.OrderCoffeeVieSet)
 router.register('orderers', views.OrderersVieSet)
 router.register('ordertopping', views.OrderToppingVieSet)
+router.register('ordertoppings', views.OrderToppingListViewSet)
 
 urlpatterns = [
     path('',include(router.urls))

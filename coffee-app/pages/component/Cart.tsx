@@ -9,7 +9,7 @@ import Router from 'next/router'
 // component
 import { StoreState, CartState, CartItemListState } from '../../src/type/type'
 import { userSlice } from '../../src/store/slice/slice';
-
+import { cartDeleteByApi } from '../../src/api/axios'
 
 // material ui
 import Table from '@material-ui/core/Table';
@@ -37,15 +37,19 @@ const Cart: VFC = () => {
   const handleLink = path => Router.push(path)
 
   const deleteCart = (index) => {
-    const newCartItemList = cartItemList.filter((c,i) => i !== index)
-    // const newCarts = Object.assign({},state.cart) 
-    // newCarts.cartItemList = newCartItemList
+    const newCartItemList = cartItemList.filter((c,i) => i !== index)    
     
     // ログインしている場合
     if(state.user.id){
       dispatch(userSlice.actions.UPDATE_CARTITEMLIST(newCartItemList))
+      cartDeleteByApi({ cart:{ id: '' }, token: state.user.token })
+      .then(res => console.log(res))
+      .catch(err => console.log(err))
     }else{
       dispatch(userSlice.actions.UPDATE_CARTITEMLIST(newCartItemList))
+      cartDeleteByApi({ cart:{ id: '' }, token: state.user.token })
+      .then(res => console.log(res))
+      .catch(err => console.log(err))
     }
 
     setCartItemList(newCartItemList)
@@ -70,7 +74,7 @@ const Cart: VFC = () => {
       // subtotal を追加
       newCartItemList = newCartItemList.map( c => {
         let cc = Object.assign({},c)
-        cc.subtotal = ( c.Coffee["coffee_" + c.price] + c.Topping.reduce((ac,cu) => ac + cu["topping_" + c.price],0)) * c.item_number
+        cc.subtotal = ( c.Coffee["coffee_" + c.item_size] + c.Topping.reduce((ac,cu) => ac + cu["topping_" + c.item_size],0)) * c.item_number
         return cc
       })            
       setCartItemList(newCartItemList)
@@ -109,12 +113,12 @@ const Cart: VFC = () => {
                 <img src={c.Coffee.img} height="100px" alt="商品" style={{borderRadius:5}}/>
                 {c.Coffee.coffee_name}
               </TableCell>
-              <TableCell>{c.price.replace('price','') + 'サイズ'}、{c.Coffee["coffee_" +c.price]}円、{c.item_number}個</TableCell>              
+              <TableCell>{c.item_size.replace('price','') + 'サイズ'}、{c.Coffee["coffee_" +c.item_size]}円、{c.item_number}個</TableCell>              
               <TableCell>
                 <ul>                     
                 {c.Topping.map((t,i) => {                  
                   return (
-                    <li key={i}>{t.topping_name}、{t["topping_" + c.price]}円</li>
+                    <li key={i}>{t.topping_name}、{t["topping_" + c.item_size]}円</li>
                   )
                 })}
                 </ul> 
