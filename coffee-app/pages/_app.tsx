@@ -48,7 +48,20 @@ function HistoryApp(props){
   )
 }
 
-const UserCheck = () => {
+export async function getStaticProps() {
+  const coffee = await axios.get('http://127.0.0.1:8000/api/coffee/')
+  const topping = await axios.get('http://127.0.0.1:8000/api/topping/')
+  const coffeeList = coffee.data
+  const toppingList = topping.data
+  return {
+    props: {
+      coffeeList,
+      toppingList
+    }
+  }
+}
+
+const UserCheck = ({coffeeList, toppingList}) => {
   const dispatch = useDispatch();
   const state = useSelector((state: DefaultRootState) => state.user);
   const [userEmail, setUserEmail] = useState("")
@@ -87,22 +100,27 @@ const UserCheck = () => {
     console.log(state);    
   }
 
+  const fetchItem = () => {
+    dispatch(userSlice.actions.FETCH_ITEM({Coffee: coffeeList}))
+    dispatch(userSlice.actions.FETCH_ITEM({Topping: toppingList}))
+  }
+
+  useEffect(() => {
+    fetchItem()
+  },[]) 
+
   useEffect(() => {     
     setUserEmail(state.user.email)
-  },[state.user]) 
-  // console.log(state.user)
+  },[state.user])   
 
   return (
     <>
       <Button onClick={statecheck} >State</Button>      
-     { state.user.email ? 
-              <span>          
+     { state.user.email ?               
                 <span style={userStyle}>
-                  <p>ユーザー名：</p>
-                  <p style={userNameStyle}>{userEmail}</p>
-                </span>                  
-                <Button onClick={logout} style={whiteMoji}><LockIcon />ログアウト</Button>                  
-              </span>          
+                  <span style={userNameStyle}>ユーザー名：{userEmail}</span>
+                  <Button onClick={logout} style={whiteMoji}><LockIcon />ログアウト</Button>
+                </span>
               :
               <Link href="/component/Login/"><a><Button style={whiteMoji}><LockOpenIcon />ログイン</Button></a></Link>
       }

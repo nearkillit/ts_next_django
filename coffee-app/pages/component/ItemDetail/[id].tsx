@@ -10,6 +10,7 @@ import { CoffeeState, ToppingState, StoreState, UserDataState } from '../../../s
 import { userSlice } from '../../../src/store/slice/slice';
 import { cartUpdateByApi } from '../../../src/api/axios'
 
+
 import axios from 'axios'
 
 // material ui
@@ -25,13 +26,27 @@ declare module 'react-redux' {
     interface DefaultRootState extends StoreState {}
 }
 
+// export async function getStaticProps() {
+
+//     const coffee = await axios.get('http://127.0.0.1:8000/api/coffee/')
+//     const topping = await axios.get('http://127.0.0.1:8000/api/topping/')
+//     const coffeeList = coffee.data
+//     const toppingList = topping.data
+//     return {
+//       props: {
+//         coffeeList,
+//         toppingList
+//       }
+//     }
+// }
+
 const ItemDetail: VFC = () =>{
-    const Router = useRouter();
-    let Item_id = Router.query.id
+    const Router = useRouter();    
     const state = useSelector((state: DefaultRootState ) => state.user)
     const dispatch = useDispatch()
     const handleLink = path => Router.push(path)
 
+    const [Item_id, setItem_id] = useState<string>(Router.query.id)
     const [dispTopping, setDispTopping] = useState<Array<ToppingState>>([])
     const [selectCoffee, setSelectCoffee] = useState<CoffeeState>({})
     const [getUser, setGetUser] = useState<UserDataState>({})
@@ -125,10 +140,6 @@ const ItemDetail: VFC = () =>{
         // textAlign: "center"
     }
 
-    useEffect(()=>{
-        // console.log(state);        
-    },[])
-
     useEffect(() => {        
         setSelectCoffee(GetCoffeeById(Item_id, state.Coffee))
     },[state.Coffee])
@@ -140,6 +151,21 @@ const ItemDetail: VFC = () =>{
     useEffect(() => {
         setGetUser(state.user)
     },[state.user])
+
+    useEffect(() => {
+        if(!Router.query.id){            
+            setItem_id(state.user.item_detail_id)
+            setSelectCoffee(GetCoffeeById(state.user.item_detail_id, state.Coffee))
+        }
+    },[state.user.item_detail_id])
+
+    // item_detail idのセット
+    useEffect(()=>{
+        if(Router.query.id){
+            setItem_id(Router.query.id)
+            dispatch(userSlice.actions.FETCH_ITEMDETAIL_ID(Router.query.id))
+        }              
+    },[])
 
     return (
         <Card style={mainview}>

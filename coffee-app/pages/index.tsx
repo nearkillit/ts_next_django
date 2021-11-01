@@ -54,7 +54,7 @@ const useStyles = makeStyles((theme) => ({
 
 export async function getStaticProps() {
     const coffee = await axios.get('http://127.0.0.1:8000/api/coffee/')
-    const topping = await axios.get('http://127.0.0.1:8000/api/topping/' )
+    const topping = await axios.get('http://127.0.0.1:8000/api/topping/')
     const coffeeList = coffee.data
     const toppingList = topping.data
     return {
@@ -78,7 +78,6 @@ const ItemView = ({coffeeList, toppingList}) => {
     const getToday = new Date()
     const now = { year: getToday.getFullYear(), month: getToday.getMonth() + 1, day: getToday.getDate(), hours: getToday.getHours()}
     const classes = useStyles();    
-    // const [test, setTest] = useState<Array<CoffeeState>>(props.Coffee)
 
     const type=(e: React.ChangeEvent<HTMLInputElement>)=>{
         setWord(e.target.value)
@@ -129,7 +128,7 @@ const ItemView = ({coffeeList, toppingList}) => {
         dispatch(userSlice.actions.FETCH_ITEM({Topping: toppingList}))
     }
     
-    useEffect(() => {
+    useEffect(() => {              
         fetchItem()
     },[]) 
 

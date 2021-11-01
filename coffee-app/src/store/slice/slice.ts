@@ -5,7 +5,7 @@ export type userState = {
     Coffee: CoffeeState | [],
     Topping: ToppingState | [],
     user: any,
-    cart: CartState ,
+    cart: CartState,
     orderhistory: OrderhistoryState
 }
 
@@ -41,12 +41,12 @@ export const userSlice = createSlice({
         },
         UPDATE_CARTITEMLIST(state, action: PayloadAction<Array<CartItemListState>>){
             state.cart.cartItemList = action.payload
+        },        
+        UPDATE_USER(state, action: PayloadAction<any>){                      
+            state.user = action.payload                        
         },
         ADD_CARTITEMLIST(state, action: PayloadAction<CartItemListState>){            
             state.cart.cartItemList.push(action.payload)            
-        },
-        UPDATE_USER(state, action: PayloadAction<any>){                      
-            state.user = action.payload                        
         },
         ADD_ORDERHISTORY(state, action: PayloadAction<CartState>){
             state.orderhistory.push(action.payload)            
@@ -56,6 +56,9 @@ export const userSlice = createSlice({
         },
         FETCH_CART_ID(state, action: PayloadAction<string>){
             state.cart.id = action.payload            
+        },
+        FETCH_ITEMDETAIL_ID(state, action: PayloadAction<string>){
+            state.user.item_detail_id = action.payload            
         },
         FETCH_ORDERHISTORY(state, action: PayloadAction<OrderhistoryState>){
             state.orderhistory = action.payload            

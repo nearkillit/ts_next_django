@@ -14,6 +14,7 @@ class UserVieSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = serializers.UserSerializer
     permission_classes = (AllowAny,)
+    
 
 class CoffeeVieSet(viewsets.ModelViewSet):
     queryset = Coffee.objects.all()
