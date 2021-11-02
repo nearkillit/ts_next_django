@@ -115,7 +115,7 @@ const UserCheck = ({coffeeList, toppingList}) => {
 
   return (
     <>
-      <Button onClick={statecheck} >State</Button>      
+      {/* <Button onClick={statecheck} >State</Button>       */}
      { state.user.email ?               
                 <span style={userStyle}>
                   <span style={userNameStyle}>ユーザー名：{userEmail}</span>
@@ -137,20 +137,22 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
     }
   }, []);
 
+  const AppHeader2 = {
+    backgroundColor: "#4682b4"
+  }
+
   return (
     <Provider store={store}>
       <ThemeProvider theme={theme}>
-      <div className="App">        
-        <AppBar>          
-          <div className='App-header1'>
+      <div className="App">
+        {/* <AppBar> */}
+          <div style={AppHeader2} >
             <HistoryApp tag='button_img' link='/' context={`/header_logo.png`}  />        
-          </div>
-          <span className='App-header2' >
             <UserCheck />
             <HistoryApp tag='button' link='/component/Cart' icon={<ShoppingCartIcon />} name='カート'/>
             <HistoryApp tag='button' link='/component/OrderHistory' icon={<HistoryIcon />} name='注文履歴'/>           
-          </span> 
-        </AppBar>               
+          </div> 
+        {/* </AppBar>                */}
       </div>
       <CssBaseline />
       <Component {...pageProps} />

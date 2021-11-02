@@ -2,6 +2,7 @@
   "/_app": "pages/_app.js",
   "/_document": "pages/_document.js",
   "/_error": "pages/_error.js",
-  "/component/Login": "pages/component/Login.js",
-  "/": "pages/index.js"
+  "/": "pages/index.js",
+  "/component/Cart": "pages/component/Cart.js",
+  "/component/ItemDetail/[id]": "pages/component/ItemDetail/[id].js"
 }
